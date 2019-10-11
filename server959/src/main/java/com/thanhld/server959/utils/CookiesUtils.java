@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.util.SerializationUtils;
 
-import com.nimbusds.jose.util.Base64;
-
 public class CookiesUtils {
 	public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
 		Cookie[] cookies = request.getCookies();

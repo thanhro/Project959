@@ -15,7 +15,6 @@ public class User extends AbstractModel {
 
 	private String name;
 
-	@Email
 	private String email;
 
 	private String imageUrl;
@@ -26,7 +25,7 @@ public class User extends AbstractModel {
 	private String password;
 
 	@NotNull
-	@JsonEnumDefaultValue // FIXME
+	@JsonEnumDefaultValue //FIXME
 	private AuthProvider authProvider;
 
 	private String providerId;
