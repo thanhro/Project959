@@ -25,7 +25,7 @@ public class User extends AbstractModel {
 	private String password;
 
 	@NotNull
-	@JsonEnumDefaultValue //FIXME
+//	@JsonEnumDefaultValue //FIXME
 	private AuthProvider authProvider;
 
 	private String providerId;
