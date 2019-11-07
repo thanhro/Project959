@@ -4,5 +4,5 @@ import org.springframework.data.annotation.Id;
 
 public class AbstractModel {
 	@Id
-	private String id;
+	protected String id;
 }
