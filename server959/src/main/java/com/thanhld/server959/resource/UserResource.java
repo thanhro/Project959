@@ -1,4 +1,4 @@
-package com.thanhld.server959.controller;
+package com.thanhld.server959.resource;
 
 import com.thanhld.server959.exception.ResourceNotFoundException;
 import com.thanhld.server959.model.User;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserController {
+public class UserResource {
     @Autowired
     private UserRepository userRepository;
 

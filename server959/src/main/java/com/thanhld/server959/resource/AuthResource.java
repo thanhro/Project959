@@ -1,4 +1,4 @@
-package com.thanhld.server959.controller;
+package com.thanhld.server959.resource;
 
 import java.net.URI;
 
@@ -29,7 +29,7 @@ import com.thanhld.server959.security.TokenProvider;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthResource {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;

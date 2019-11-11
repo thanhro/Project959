@@ -16,13 +16,13 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long id;
+	private String id;
 	private String email;
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
-	public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+	public UserPrincipal(String id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
@@ -44,7 +44,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 		return userPrincipal;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 

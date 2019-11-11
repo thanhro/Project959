@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "user")
 public class User extends AbstractModel {
 
-	private Long id;
+	private String id;
 
 	private String name;
 
@@ -33,7 +33,7 @@ public class User extends AbstractModel {
 	public User() {
 	}
 
-	public User(Long id, String name, @Email String email, String imageUrl, Boolean emailVerified, String password,
+	public User(String id, String name, @Email String email, String imageUrl, Boolean emailVerified, String password,
 			@NotNull AuthProvider authProvider, String providerId) {
 		super();
 		this.id = id;
@@ -46,11 +46,11 @@ public class User extends AbstractModel {
 		this.providerId = providerId;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(String userId) {
 		this.id = userId;
 	}
 

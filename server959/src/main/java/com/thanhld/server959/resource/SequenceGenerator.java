@@ -1,4 +1,4 @@
-package com.thanhld.server959.controller;
+package com.thanhld.server959.resource;
 
 
 import java.net.NetworkInterface;
