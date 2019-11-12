@@ -18,6 +18,7 @@ import Alert from 'react-s-alert';
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import './App.css';
+import Rooms from "../rooms/Rooms";
 
 class App extends Component {
   constructor(props) {
@@ -46,6 +47,7 @@ class App extends Component {
       });
     }).catch(error => {
       this.setState({
+
         loading: false
       });  
     });    
@@ -83,7 +85,10 @@ class App extends Component {
               render={(props) => <Login authenticated={this.state.authenticated} {...props} />}></Route>
             <Route path="/signup"
               render={(props) => <Signup authenticated={this.state.authenticated} {...props} />}></Route>
-            <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}></Route>  
+              <Route path="/rooms"
+                     render={(props) => <Rooms authenticated={this.state.authenticated} {...props} />}></Route>
+            <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}></Route>
+
             <Route component={NotFound}></Route>
           </Switch>
         </div>
