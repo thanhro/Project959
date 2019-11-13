@@ -1,6 +1,6 @@
 package com.thanhld.server959.repository;
 
-import com.thanhld.server959.model.User;
+import com.thanhld.server959.model.user.User;
 
 import java.util.Optional;
 

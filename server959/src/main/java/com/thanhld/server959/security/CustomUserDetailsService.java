@@ -1,7 +1,7 @@
 package com.thanhld.server959.security;
 
 import com.thanhld.server959.exception.ResourceNotFoundException;
-import com.thanhld.server959.model.User;
+import com.thanhld.server959.model.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,6 +1,6 @@
 package com.thanhld.server959.repository;
 
-import com.thanhld.server959.model.Class;
+import com.thanhld.server959.model.classes.Class;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

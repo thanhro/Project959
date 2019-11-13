@@ -1,4 +1,4 @@
-package com.thanhld.server959.model;
+package com.thanhld.server959.model.security;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

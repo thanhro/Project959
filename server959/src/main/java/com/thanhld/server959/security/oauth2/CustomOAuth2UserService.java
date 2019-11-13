@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.thanhld.server959.exception.OAuth2AuthenticationProcessingException;
-import com.thanhld.server959.model.AuthProvider;
-import com.thanhld.server959.model.User;
+import com.thanhld.server959.model.security.AuthProvider;
+import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.security.UserPrincipal;
 import com.thanhld.server959.security.oauth2.user.OAuth2UserInfo;

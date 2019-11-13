@@ -3,7 +3,7 @@ package com.thanhld.server959.security.oauth2.user;
 import java.util.Map;
 
 import com.thanhld.server959.exception.OAuth2AuthenticationProcessingException;
-import com.thanhld.server959.model.AuthProvider;
+import com.thanhld.server959.model.security.AuthProvider;
 
 public class OAuth2UserInfoFactory {
 	public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {

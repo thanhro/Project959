@@ -1,8 +1,10 @@
-package com.thanhld.server959.model;
+package com.thanhld.server959.model.user;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+import com.thanhld.server959.model.AbstractModel;
+import com.thanhld.server959.model.security.AuthProvider;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;

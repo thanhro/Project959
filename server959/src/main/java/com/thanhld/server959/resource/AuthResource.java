@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.thanhld.server959.exception.BadRequestException;
-import com.thanhld.server959.model.AuthProvider;
-import com.thanhld.server959.model.User;
+import com.thanhld.server959.model.security.AuthProvider;
+import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.payload.ApiResponse;
 import com.thanhld.server959.payload.AuthResponse;
 import com.thanhld.server959.payload.LoginRequest;

@@ -1,7 +1,7 @@
 package com.thanhld.server959.resource;
 
 import com.thanhld.server959.exception.ResourceNotFoundException;
-import com.thanhld.server959.model.User;
+import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.security.CurrentUser;
 import com.thanhld.server959.security.UserPrincipal;
