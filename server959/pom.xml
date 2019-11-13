@@ -85,6 +85,12 @@
             <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.zalando/problem-spring-web -->
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>problem-spring-web</artifactId>
+            <version>0.25.0</version>
+        </dependency>
     </dependencies>
 
     <build>
