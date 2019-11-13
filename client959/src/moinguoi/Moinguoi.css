@@ -1,0 +1,17 @@
+h2{
+    color: #1967d2;
+    width: 50%;
+    float: left;
+    margin-left: 4%;
+}
+img{
+    margin-left: 40%;
+}
+img:hover{
+    cursor: pointer;
+}
+.data{
+    border-top: 1px solid #1967d2;
+    margin-top: 2%;
+}
+

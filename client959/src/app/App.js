@@ -19,6 +19,9 @@ import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import './App.css';
 import Rooms from "../rooms/Rooms";
+// import Detail from "../detail/detail";
+import BT from "../Bt/Bt";
+import Moinguoi from "../moinguoi/Moinguoi";
 
 class App extends Component {
   constructor(props) {
@@ -88,7 +91,10 @@ class App extends Component {
               <Route path="/rooms"
                      render={(props) => <Rooms authenticated={this.state.authenticated} {...props} />}></Route>
             <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}></Route>
-
+              <Route path="/bt"
+                     render={(props) => <BT authenticated={this.state.authenticated} {...props} />}></Route>
+            <Route path="/people"
+                   render={(props) => <Moinguoi authenticated={this.state.authenticated} {...props} />}></Route>
             <Route component={NotFound}></Route>
           </Switch>
         </div>
