@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Setter
 @Getter
 @ToString
@@ -14,6 +16,7 @@ public class Class extends AbstractModel {
     private String classDescription;
     private String classCode;
     private String coach;
+    private List<String> listMemeberId;
 
     public Class(ClassBuilder classBuilder) {
         this.id = classBuilder.id;
@@ -21,6 +24,7 @@ public class Class extends AbstractModel {
         this.classDescription = classBuilder.classDescription;
         this.classCode = classBuilder.classCode;
         this.coach = classBuilder.coach;
+        this.listMemeberId = classBuilder.listMemeberId;
     }
 
     public static class ClassBuilder {
@@ -29,15 +33,17 @@ public class Class extends AbstractModel {
         private String classDescription;
         private String classCode;
         private String coach;
+        private List<String> listMemeberId;
 
         public ClassBuilder() {
 
         }
 
-        public ClassBuilder(String className, String classCode, String coach) {
+        public ClassBuilder(String className, String classCode, String coach, List<String> listMemeberId) {
             this.className = className;
             this.classCode = classCode;
             this.coach = coach;
+            this.listMemeberId = listMemeberId;
         }
 
         public ClassBuilder setId(String id) {
@@ -62,6 +68,11 @@ public class Class extends AbstractModel {
 
         public ClassBuilder setClassCoach(String coach) {
             this.coach = coach;
+            return this;
+        }
+
+        public ClassBuilder setListMemeberId(List<String> listMemeberId){
+            this.listMemeberId = listMemeberId;
             return this;
         }
 
