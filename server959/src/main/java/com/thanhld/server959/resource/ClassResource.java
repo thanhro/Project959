@@ -12,30 +12,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/classes")
 public class ClassResource {
 
     @Autowired
     ClassService classService;
 
-    @PostMapping("/class")
+    @GetMapping("/class")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Class> getClassByCode(@RequestParam String code) {
         Class classroom = classService.getByClassByCode(code);
         return ResponseObjectFactory.toResult(classroom, HttpStatus.OK);
     }
 
-    @GetMapping("/classes")
+    @GetMapping("")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<Class>> getAllClass() {
         List<Class> courses = classService.findAllClass();
         if (courses == null || courses.isEmpty())
             return ResponseObjectFactory.toResult("Not have a classes", HttpStatus.NO_CONTENT);
-        return ResponseObjectFactory.toResult(courses, HttpStatus.NOT_FOUND);
+        return ResponseObjectFactory.toResult(courses, HttpStatus.OK);
     }
 
     @PostMapping("/class")
     public ResponseEntity<Void> createClass(@RequestBody Class classContents){
         classService.createClass(classContents);
-        return ResponseObjectFactory.toResult("Error", HttpStatus.BAD_REQUEST);
+        return ResponseObjectFactory.toResult("Error", HttpStatus.OK);
     }
 }
