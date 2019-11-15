@@ -7,11 +7,11 @@ import java.util.List;
 public interface ClassService {
     List<Class> findAllClass();
 
-    Class joinClassByCode(String code);
+    void joinClassByCode(String code);
 
     void createClass(Class classContents);
 
-    void deleteClass(String classId);
+    void deleteClassByCode(String classId);
 
-    void updateClass(Class classObject);
+    void updateClass(String classObject);
 }

@@ -1,6 +1,5 @@
 package com.thanhld.server959.service.user;
 
-import com.thanhld.server959.exception.BadRequestException;
 import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.security.UserPrincipal;
@@ -17,6 +16,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentUser(UserPrincipal userPrincipal) {
-        return userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new BadRequestAlertException(ErrorConstants.USER_NOT_FOUND, "userId", ErrorConstants.USER_NOT_FOUND));
+        return userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "userId not found", "userId", ErrorConstants.USER_NOT_FOUND));
     }
 }

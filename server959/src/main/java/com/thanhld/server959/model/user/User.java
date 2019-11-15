@@ -13,8 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "user")
 public class User extends AbstractModel {
 
-	private String id;
-
 	private String name;
 
 	private String email;

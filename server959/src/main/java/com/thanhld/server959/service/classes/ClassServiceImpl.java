@@ -21,46 +21,56 @@ public class ClassServiceImpl implements ClassService {
         return classRepository.findAll();
     }
 
-    public Class joinClassByCode(String code) {
-        Class classObject = classRepository.getClassByCode(code);
+    public void joinClassByCode(String classCode) {
+        Class classObject = findByCode(classCode);
         if (classObject == null)
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
         List<String> listMemberId = classObject.getListMemeberId();
-        if (!listMemberId.contains(userId)) {
+        if (!(listMemberId.contains(userId) || classObject.getCoach().equals(userId))) {
             listMemberId.add(userId);
             classObject.setListMemeberId(listMemberId);
-            updateClass(classObject);
+            classRepository.save(classObject);
         }
-        return classRepository.getClassByCode(code);
     }
 
     @Override
     public void createClass(Class classContents) {
         String classCode = RandomCodeFactory.getRandomCode(4);
         String className = classContents.getClassName();
-        String coach = classContents.getCoach();
+        String coach = SecurityUtils.getCurrentUserLogin().get().getId();
         String classDescription = classContents.getClassDescription();
-        Class classObject = new Class.ClassBuilder()
-                .setClassCode(classCode)
-                .setClassName(className)
-                .setClassDescription(classDescription)
-                .setClassCoach(coach)
-                .setListMemeberId(new ArrayList<>()).build();
+        Class classObject = Class.builder()
+                .classCode(classCode)
+                .className(className)
+                .classDescription(classDescription)
+                .coach(coach)
+                .listMemeberId(new ArrayList<>()).build();
         classRepository.save(classObject);
     }
 
     @Override
-    public void deleteClass(String classId) {
-        if (!classRepository.findById(classId).isPresent())
+    public void deleteClassByCode(String classCode) {
+        Class classObject = findByCode(classCode);
+        if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
-        classRepository.deleteById(classId);
+        }
+        classRepository.delete(classObject);
     }
 
     @Override
-    public void updateClass(Class classObject) {
+    public void updateClass(String classCode) {
+        Class classObject = findByCode(classCode);
+        if (classObject == null){
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
         classRepository.save(classObject);
     }
 
-
+    public Class findByCode(String classCode){
+        Class classObject = classRepository.findByCode(classCode);
+        if (classObject != null)
+            return classObject;
+        return null;
+    }
 }

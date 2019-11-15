@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ClassRepository extends MongoRepository<Class, String> {
 
     @Query("{'classCode':?0}")
-    Class getClassByCode(String code);
+    Class findByCode(String code);
 }
