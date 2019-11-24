@@ -91,6 +91,13 @@
             <artifactId>problem-spring-web</artifactId>
             <version>0.25.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev133-1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
