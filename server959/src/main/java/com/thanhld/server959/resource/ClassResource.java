@@ -39,19 +39,20 @@ public class ClassResource {
 
     //create class
     @PostMapping(value = "/class", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createClass(@RequestBody Class classesContents) {
+    public ResponseEntity<String> createClass(@RequestBody Class classesContents) {
         classService.createClass(classesContents);
-        return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
+        String folderClasslink = classService.createFolderClass(classesContents.getClassName());
+        return ResponseObjectFactory.toResult(folderClasslink, HttpStatus.OK);
     }
 
     @DeleteMapping("/class/{classCode}")
-    public ResponseEntity<Void> deleteClassByCode(@PathVariable("classCode") String classCode){
+    public ResponseEntity<Void> deleteClassByCode(@PathVariable("classCode") String classCode) {
         classService.deleteClassByCode(classCode);
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 
     @PutMapping("class/{classCode}")
-    public ResponseEntity<Void> updateClass(@PathVariable("classCode") String classCode){
+    public ResponseEntity<Void> updateClass(@PathVariable("classCode") String classCode) {
         classService.updateClass(classCode);
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }

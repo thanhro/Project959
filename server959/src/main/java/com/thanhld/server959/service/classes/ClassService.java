@@ -14,4 +14,6 @@ public interface ClassService {
     void deleteClassByCode(String classId);
 
     void updateClass(String classObject);
+
+    String createFolderClass(String className);
 }

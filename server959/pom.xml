@@ -97,7 +97,11 @@
             <version>v3-rev133-1.25.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.23.0</version>
+        </dependency>
     </dependencies>
 
     <build>

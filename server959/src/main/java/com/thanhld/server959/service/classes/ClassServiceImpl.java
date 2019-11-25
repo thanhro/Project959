@@ -3,6 +3,7 @@ package com.thanhld.server959.service.classes;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
 import com.thanhld.server959.repository.ClassRepository;
+import com.thanhld.server959.service.googledrive.GoogleDriveService;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
@@ -14,6 +15,10 @@ import java.util.List;
 
 @Service
 public class ClassServiceImpl implements ClassService {
+
+    @Autowired
+    GoogleDriveService googleDriveService;
+
     @Autowired
     ClassRepository classRepository;
 
@@ -72,5 +77,10 @@ public class ClassServiceImpl implements ClassService {
         if (classObject != null)
             return classObject;
         return null;
+    }
+
+    @Override
+    public String createFolderClass(String className){
+        return googleDriveService.createFolderClassAssignment(className);
     }
 }
