@@ -9,7 +9,7 @@ public interface ClassService {
 
     void joinClassByCode(String code);
 
-    void createClass(Class classContents);
+    Class createClass(Class classContents);
 
     void deleteClassByCode(String classId);
 

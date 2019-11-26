@@ -10,6 +10,8 @@ public final class ErrorConstants {
     public static final URI DEFAULT_TYPE = URI.create(PROBLEM_BASE_URL + "/problem-with-message");
     public static final URI NO_DATA_TYPE = URI.create(PROBLEM_BASE_URL + "/no-data");
     public static final URI ENTITY_NOT_FOUND = URI.create(PROBLEM_BASE_URL + "/entity-not-found");
+    public static final URI ENTITY_NOT_HAVE_PERMISSION = URI.create(PROBLEM_BASE_URL + "/entity-not-have-permission");
+    public static final URI ENTITY_EXISTED = URI.create(PROBLEM_BASE_URL + "/entity-existed");
     public static final URI CONSTRAINT_VIOLATION_TYPE = URI.create(PROBLEM_BASE_URL + "/constraint-violation");
     public static final URI PARAMETERIZED_TYPE = URI.create(PROBLEM_BASE_URL + "/parameterized");
     public static final URI ENTITY_NOT_FOUND_TYPE = URI.create(PROBLEM_BASE_URL + "/entity-not-found");
@@ -29,7 +31,11 @@ public final class ErrorConstants {
     public static final int DATA_EXISTED_CODE = 506;
     public static final int NO_DATA_CODE = 507;
     public static final int LOGIN_ALREADY_USED_CODE = 508;
+    public static final int CLASS_ALREADY_EXISTED = 509;
+    public static final int ASSIGNMENT_ALREADY_EXISTED = 510;
     public static final int NULL_VALUE = 511;
+    public static final int ASSIGNMENT_NOT_FOUND = 512;
+    public static final int USER_NOT_HAVE_PERMISSION = 513;
 
     private ErrorConstants() {
     }

@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/classes")
@@ -40,9 +41,8 @@ public class ClassResource {
     //create class
     @PostMapping(value = "/class", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createClass(@RequestBody Class classesContents) {
-        classService.createClass(classesContents);
-        String folderClasslink = classService.createFolderClass(classesContents.getClassName());
-        return ResponseObjectFactory.toResult(folderClasslink, HttpStatus.OK);
+        Class classObject = classService.createClass(classesContents);
+        return ResponseObjectFactory.toResult(classObject.getGoogleDrive(), HttpStatus.OK);
     }
 
     @DeleteMapping("/class/{classCode}")

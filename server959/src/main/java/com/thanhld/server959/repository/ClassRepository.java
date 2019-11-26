@@ -10,4 +10,7 @@ public interface ClassRepository extends MongoRepository<Class, String> {
 
     @Query("{'classCode':?0}")
     Class findByCode(String code);
+
+    @Query("{'classCode' : ?0 ,'coach' : ?1}")
+    Class findByNameAndCoach(String classCode, String coach);
 }

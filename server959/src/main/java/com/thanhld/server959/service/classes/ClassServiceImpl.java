@@ -40,18 +40,23 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
-    public void createClass(Class classContents) {
+    public Class createClass(Class classContents) {
         String classCode = RandomCodeFactory.getRandomCode(4);
         String className = classContents.getClassName();
         String coach = SecurityUtils.getCurrentUserLogin().get().getId();
+        if (classRepository.findByNameAndCoach(classContents.getClassName(), coach) != null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_EXISTED, "Class existed", "Class", ErrorConstants.CLASS_ALREADY_EXISTED);
+        }
         String classDescription = classContents.getClassDescription();
         Class classObject = Class.builder()
                 .classCode(classCode)
                 .className(className)
                 .classDescription(classDescription)
                 .coach(coach)
+                .googleDrive(createFolderClass(className))
                 .listMemeberId(new ArrayList<>()).build();
         classRepository.save(classObject);
+        return classObject;
     }
 
     @Override
@@ -66,13 +71,13 @@ public class ClassServiceImpl implements ClassService {
     @Override
     public void updateClass(String classCode) {
         Class classObject = findByCode(classCode);
-        if (classObject == null){
+        if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
         classRepository.save(classObject);
     }
 
-    public Class findByCode(String classCode){
+    public Class findByCode(String classCode) {
         Class classObject = classRepository.findByCode(classCode);
         if (classObject != null)
             return classObject;
@@ -80,7 +85,7 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
-    public String createFolderClass(String className){
-        return googleDriveService.createFolderClassAssignment(className);
+    public String createFolderClass(String className) {
+        return googleDriveService.createFolder(className);
     }
 }
