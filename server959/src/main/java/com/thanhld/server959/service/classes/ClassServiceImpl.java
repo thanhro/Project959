@@ -1,8 +1,10 @@
 package com.thanhld.server959.service.classes;
 
 import com.thanhld.server959.model.classes.Class;
+import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
 import com.thanhld.server959.repository.ClassRepository;
+import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClassServiceImpl implements ClassService {
@@ -22,6 +25,9 @@ public class ClassServiceImpl implements ClassService {
     @Autowired
     ClassRepository classRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     public List<Class> findAllClass() {
         return classRepository.findAll();
     }
@@ -31,6 +37,10 @@ public class ClassServiceImpl implements ClassService {
         if (classObject == null)
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isPresent()){
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
         List<String> listMemberId = classObject.getListMemeberId();
         if (!(listMemberId.contains(userId) || classObject.getCoach().equals(userId))) {
             listMemberId.add(userId);
@@ -87,5 +97,26 @@ public class ClassServiceImpl implements ClassService {
     @Override
     public String createFolderClass(String className) {
         return googleDriveService.createFolder(className);
+    }
+
+    @Override
+    public List<User> getAllClassMembers(String classCode) {
+        Class classObject = findByCode(classCode);
+        if (classObject == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+
+        List<String> listMemberId = classObject.getListMemeberId();
+        if (listMemberId == null || listMemberId.isEmpty())
+            return null;
+
+        List<User> listMembers = null;
+        Optional<User> user;
+        for (String id: listMemberId){
+            user = userRepository.findById(id);
+            if(user.isPresent())
+                listMembers.add(user.get());
+        }
+        return listMembers;
     }
 }

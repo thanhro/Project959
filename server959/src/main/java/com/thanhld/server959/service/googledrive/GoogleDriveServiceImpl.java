@@ -4,8 +4,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.User;
-import com.thanhld.server959.utils.GoogleDriveUtils;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -17,8 +17,11 @@ import java.util.Set;
 @Service
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
+    @Autowired
+    GoogleDriveAuthService googleDriveAuthService;
+
     public List<File> getAllFiles() {
-        Drive drive = GoogleDriveUtils.getService();
+        Drive drive = googleDriveAuthService.getService();
         try {
             FileList fileList = drive.files().list()
                     .setFields("nextPageToken, files(name)")
@@ -50,7 +53,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Override
     public String createFolder(String folderName) {
-        Drive drive = GoogleDriveUtils.getService();
+        Drive drive = googleDriveAuthService.getService();
         File fileMetaData = new File();
         fileMetaData.setName(folderName);
         fileMetaData.setMimeType("application/vnd.google-apps.folder");
@@ -66,7 +69,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Override
     public Set<String> getAllOwnersSharedFileToTeacher() throws IOException {
-        Drive drive = GoogleDriveUtils.getService();
+        Drive drive = googleDriveAuthService.getService();
         String currentEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
         FileList fileList = drive.files().list().setFields("*").setQ("mimeType = 'application/vnd.google-apps.document'").execute();
         if (fileList == null)
@@ -93,7 +96,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Override
     public File getFolderByWebViewLink(String webViewLink) throws IOException {
-        Drive drive = GoogleDriveUtils.getService();
+        Drive drive = googleDriveAuthService.getService();
         FileList fileList = drive.files().list().setFields("*").setQ("mimeType = 'application/vnd.google-apps.folder'").execute();
         if (fileList == null)
             return null;

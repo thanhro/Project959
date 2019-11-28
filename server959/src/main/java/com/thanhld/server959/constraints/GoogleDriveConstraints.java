@@ -23,4 +23,8 @@ public class GoogleDriveConstraints {
     // scopes, delete your previously saved credentials/ folder.
     //
     public static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
+
+    public static final String CALLBACK_URI = "http://localhost:8080/auth/oauth2/callback";
+
+    public static final String USER_GOOGLE_DRIVE = "Thanhro";
 }

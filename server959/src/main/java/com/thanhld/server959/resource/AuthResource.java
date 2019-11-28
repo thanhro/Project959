@@ -1,20 +1,22 @@
 package com.thanhld.server959.resource;
 
+import java.io.IOException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 
 import javax.validation.Valid;
 
+import com.thanhld.server959.model.security.ResponseObjectFactory;
+import com.thanhld.server959.service.googledrive.GoogleDriveAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.thanhld.server959.exception.BadRequestException;
@@ -42,6 +44,11 @@ public class AuthResource {
 
 	@Autowired
 	private TokenProvider tokenProvider;
+
+	@Autowired
+	private GoogleDriveAuthService googleDriveAuthService;
+
+	private static final String HOST = "http://localhost:8080/auth/oauth2/callback";
 
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -78,4 +85,17 @@ public class AuthResource {
 		return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully@"));
 	}
 
+	@GetMapping("/oauth2")
+	public String login() throws IOException, GeneralSecurityException {
+		return googleDriveAuthService.getGoogleAuthorizationCodeFlow().newAuthorizationUrl().setRedirectUri(HOST).build();
+	}
+
+	@GetMapping("/oauth2/callback")
+	public ResponseEntity<String> loginCallback(@RequestParam("code") String code) throws Exception {
+		if (code != null){
+			googleDriveAuthService.saveToken(code);
+			return ResponseObjectFactory.toResult("OK", HttpStatus.OK);
+		}
+		return ResponseObjectFactory.toResult("ERROR", HttpStatus.BAD_REQUEST);
+	}
 }

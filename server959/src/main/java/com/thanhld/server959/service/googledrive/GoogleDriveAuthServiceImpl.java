@@ -1,23 +1,27 @@
-package com.thanhld.server959.utils;
+package com.thanhld.server959.service.googledrive;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.thanhld.server959.constraints.GoogleDriveConstraints;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.security.GeneralSecurityException;
 
-public class GoogleDriveUtils {
+@Service
+public class GoogleDriveAuthServiceImpl implements GoogleDriveAuthService {
 
-    public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    private GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow;
 
+    @PostConstruct
+    public void googleAuth() throws IOException, GeneralSecurityException {
         java.io.File clientSecretFilePath = new java.io.File(GoogleDriveConstraints.CREDENTIALS_FOLDER, GoogleDriveConstraints.CLIENT_SECRET_FILE_NAME);
 
         if (!clientSecretFilePath.exists()) {
@@ -29,20 +33,24 @@ public class GoogleDriveUtils {
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(GoogleDriveConstraints.JSON_FACTORY, new InputStreamReader(in));
 
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, GoogleDriveConstraints.JSON_FACTORY,
+        googleAuthorizationCodeFlow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), GoogleDriveConstraints.JSON_FACTORY,
                 clientSecrets, GoogleDriveConstraints.SCOPES).setDataStoreFactory(new FileDataStoreFactory(GoogleDriveConstraints.CREDENTIALS_FOLDER))
                 .setAccessType("offline").build();
-
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver.Builder().setPort(8888).build()).authorize("user");
     }
 
-    public static Drive getService() {
+    @Override
+    public GoogleAuthorizationCodeFlow getGoogleAuthorizationCodeFlow() {
+        return googleAuthorizationCodeFlow;
+    }
+
+    @Override
+    public Drive getService() {
         try {
             NetHttpTransport HTTP_TRANSPORT;
             Credential credential;
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            credential = getCredentials(HTTP_TRANSPORT);
-            return new Drive.Builder(HTTP_TRANSPORT, GoogleDriveConstraints.JSON_FACTORY, credential) //
+            credential = googleAuthorizationCodeFlow.loadCredential(GoogleDriveConstraints.USER_GOOGLE_DRIVE);
+            return new Drive.Builder(HTTP_TRANSPORT, GoogleDriveConstraints.JSON_FACTORY, credential)
                     .setApplicationName(GoogleDriveConstraints.APPLICATION_NAME).build();
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
@@ -52,4 +60,9 @@ public class GoogleDriveUtils {
         return null;
     }
 
+    @Override
+    public void saveToken(String code) throws Exception {
+        GoogleTokenResponse response = googleAuthorizationCodeFlow.newTokenRequest(code).setRedirectUri(GoogleDriveConstraints.CALLBACK_URI).execute();
+        googleAuthorizationCodeFlow.createAndStoreCredential(response, GoogleDriveConstraints.USER_GOOGLE_DRIVE);
+    }
 }

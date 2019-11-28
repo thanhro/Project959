@@ -51,9 +51,15 @@ public class ClassResource {
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 
-    @PutMapping("class/{classCode}")
+    @PutMapping("/class/{classCode}")
     public ResponseEntity<Void> updateClass(@PathVariable("classCode") String classCode) {
         classService.updateClass(classCode);
+        return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/class/{classCode}/users")
+    public ResponseEntity<Void> getAllClassMembets(@PathVariable("classCode") String classCode) {
+        classService.getAllClassMembers(classCode);
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 }
