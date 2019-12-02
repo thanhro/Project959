@@ -1,17 +1,21 @@
 package com.thanhld.server959.service.classes;
 
+import com.google.api.services.drive.model.File;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
 import com.thanhld.server959.repository.ClassRepository;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
+import com.thanhld.server959.service.googledrive.GoogleDriveServiceUtils;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,7 +100,14 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public String createFolderClass(String className) {
-        return googleDriveService.createFolder(className);
+        try {
+            return googleDriveService.createFolder(className);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

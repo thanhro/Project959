@@ -1,14 +1,21 @@
 package com.thanhld.server959.service.googledrive;
 
+import com.google.api.client.googleapis.batch.BatchRequest;
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
 import com.google.api.services.drive.model.User;
+import com.thanhld.server959.constraints.GoogleDriveConstraints;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,13 +25,13 @@ import java.util.Set;
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Autowired
-    GoogleDriveAuthService googleDriveAuthService;
+    GoogleDriveServiceUtils googleDriveServiceUtils;
 
     public List<File> getAllFiles() {
-        Drive drive = googleDriveAuthService.getService();
         try {
+            Drive drive = googleDriveServiceUtils.getService();
             FileList fileList = drive.files().list()
-                    .setFields("nextPageToken, files(name)")
+                    .setFields("nextPageToken, files(*)")
                     .execute();
             List<File> files = fileList.getFiles();
             if (files == null || files.isEmpty()) {
@@ -33,6 +40,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
             return files;
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
         return null;
@@ -52,8 +61,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public String createFolder(String folderName) {
-        Drive drive = googleDriveAuthService.getService();
+    public String createFolder(String folderName) throws GeneralSecurityException, IOException {
+        Drive drive = googleDriveServiceUtils.getService();
         File fileMetaData = new File();
         fileMetaData.setName(folderName);
         fileMetaData.setMimeType("application/vnd.google-apps.folder");
@@ -61,15 +70,18 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         File file = null;
         try {
             file = drive.files().create(fileMetaData).setFields("*").execute();
+            changeOwnerPermissionToCurrentUser(file);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
         return file.getWebViewLink();
     }
 
     @Override
-    public Set<String> getAllOwnersSharedFileToTeacher() throws IOException {
-        Drive drive = googleDriveAuthService.getService();
+    public Set<String> getAllOwnersSharedFileToTeacher() throws IOException, GeneralSecurityException {
+        Drive drive = googleDriveServiceUtils.getService();
         String currentEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
         FileList fileList = drive.files().list().setFields("*").setQ("mimeType = 'application/vnd.google-apps.document'").execute();
         if (fileList == null)
@@ -95,8 +107,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public File getFolderByWebViewLink(String webViewLink) throws IOException {
-        Drive drive = googleDriveAuthService.getService();
+    public File getFolderByWebViewLink(String webViewLink) throws IOException, GeneralSecurityException {
+        Drive drive = googleDriveServiceUtils.getService();
         FileList fileList = drive.files().list().setFields("*").setQ("mimeType = 'application/vnd.google-apps.folder'").execute();
         if (fileList == null)
             return null;
@@ -107,4 +119,35 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         }
         return folder;
     }
+
+    public void changeOwnerPermissionToCurrentUser(File file) throws GeneralSecurityException, IOException {
+        Drive drive = googleDriveServiceUtils.getService();
+        JsonBatchCallback<Permission> callback = new JsonBatchCallback<Permission>() {
+            @Override
+            public void onFailure(GoogleJsonError e,
+                                  HttpHeaders responseHeaders)
+                    throws IOException {
+                // Handle error
+                System.err.println(e.getMessage());
+            }
+            @Override
+            public void onSuccess(Permission permission,
+                                  HttpHeaders responseHeaders)
+                    throws IOException {
+                System.out.println("Permission ID: " + permission.getId());
+            }
+        };
+        String currentUserEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
+        BatchRequest batch = drive.batch();
+        Permission userPermission = new Permission()
+                .setType("user")
+                .setRole("owner")
+                .setEmailAddress(currentUserEmail);
+        drive.permissions().create(file.getId(), userPermission)
+                .setFields("*").setTransferOwnership(true)
+                .queue(batch, callback);
+        batch.execute();
+        drive.permissions().delete(file.getId(), GoogleDriveConstraints.SERVICE_ACCOUNT_PERMISSION_ID).execute();
+    }
+
 }

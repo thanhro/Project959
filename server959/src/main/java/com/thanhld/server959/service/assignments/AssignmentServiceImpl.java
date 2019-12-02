@@ -5,8 +5,8 @@ import com.thanhld.server959.model.assignment.Assignment;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.repository.AssignmentRepository;
 import com.thanhld.server959.repository.ClassRepository;
-import com.thanhld.server959.service.googledrive.GoogleDriveAuthService;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
+import com.thanhld.server959.service.googledrive.GoogleDriveServiceUtils;
 import com.thanhld.server959.utils.DateUtils;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
@@ -31,7 +31,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     GoogleDriveService googleDriveService;
 
     @Autowired
-    GoogleDriveAuthService googleDriveAuthService;
+    GoogleDriveServiceUtils googleDriveServiceUtils;
 
     private String createFolderAssignment(String assignmentName, String webViewLink) {
         try {
@@ -41,7 +41,9 @@ public class AssignmentServiceImpl implements AssignmentService {
             fileMetaData.setName(assignmentName);
             fileMetaData.setMimeType("application/vnd.google-apps.folder");
             fileMetaData.setParents(Collections.singletonList(folderParent.getId()));
-            return googleDriveAuthService.getService().files().create(fileMetaData).setFields("*").execute().getWebViewLink();
+            String webViewLinkAssignment = googleDriveServiceUtils.getService().files().create(fileMetaData).setFields("*").execute().getWebViewLink();
+            googleDriveService.changeOwnerPermissionToCurrentUser(fileMetaData);
+            return webViewLinkAssignment;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
