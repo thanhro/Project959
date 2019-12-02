@@ -2,6 +2,7 @@ package com.thanhld.server959.resource;
 
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.security.ResponseObjectFactory;
+import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.service.classes.ClassService;
 import com.thanhld.server959.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class ClassResource {
             classService.deleteClassByCode(classCode);
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseObjectFactory.toResult("Eror", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseObjectFactory.toResult("Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
@@ -64,8 +65,8 @@ public class ClassResource {
     }
 
     @GetMapping("/class/{classCode}/users")
-    public ResponseEntity<Void> getAllClassMembets(@PathVariable("classCode") String classCode) {
-        classService.getAllClassMembers(classCode);
-        return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
+    public ResponseEntity<Void> getAllClassMembers(@PathVariable("classCode") String classCode) {
+        List<User> listUser = classService.getAllClassMembers(classCode);
+        return ResponseObjectFactory.toResult(listUser, HttpStatus.OK);
     }
 }

@@ -50,7 +50,7 @@ public class ClassServiceImpl implements ClassService {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
+        if (!user.isPresent()) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "User not found", "User", ErrorConstants.USER_NOT_FOUND);
         }
         List<String> listMemberId = classObject.getListMemeberId();
@@ -147,7 +147,7 @@ public class ClassServiceImpl implements ClassService {
         if (listMemberId == null || listMemberId.isEmpty())
             return null;
 
-        List<User> listMembers = null;
+        List<User> listMembers = new ArrayList<>();
         Optional<User> user;
         for (String id : listMemberId) {
             user = userRepository.findById(id);
