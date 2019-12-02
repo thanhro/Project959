@@ -93,7 +93,7 @@ public class ClassServiceImpl implements ClassService {
         }
         List<File> files = googleDriveService.getAllFiles();
         if (files == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_GOOGLE_DRIVE_NOT_FOUND, "User not have permission", "User permission", ErrorConstants.FILE_GOOGLE_DRIVE_NOT_FOUND);
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_GOOGLE_DRIVE_NOT_FOUND, "File not found", "File", ErrorConstants.FILE_GOOGLE_DRIVE_NOT_FOUND);
         }
         for (File file : files) {
             if (file.getWebViewLink().equals(classObject.getGoogleDrive())) {
