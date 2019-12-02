@@ -1,13 +1,19 @@
 package com.thanhld.server959.service.classes;
 
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
+import com.thanhld.server959.config.GoogleDriveServiceConfig;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
 import com.thanhld.server959.repository.ClassRepository;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
-import com.thanhld.server959.service.googledrive.GoogleDriveServiceUtils;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
@@ -19,6 +25,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class ClassServiceImpl implements ClassService {
@@ -32,8 +39,65 @@ public class ClassServiceImpl implements ClassService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private Drive googleDrive;
+
+    @Autowired
+    private GoogleDriveServiceConfig googleDriveServiceConfig;
+
     public List<Class> findAllClass() {
+        try {
+            Drive drive = googleDriveServiceConfig.getService();
+
+            JsonBatchCallback<Permission> callback = new JsonBatchCallback<Permission>() {
+                @Override
+                public void onSuccess(Permission permission, HttpHeaders httpHeaders) throws IOException {
+                    System.out.println("Permission ID: " + permission.getId());
+                }
+
+                @Override
+                public void onFailure(GoogleJsonError googleJsonError, HttpHeaders httpHeaders) throws IOException {
+                    System.err.println(googleJsonError.getMessage());
+                }
+            };
+            try {
+                FileList fileList = drive.files().list()
+                        .setFields("nextPageToken, files(*)")
+                        .execute();
+                List<File> files = fileList.getFiles();
+                for (File file : files) {
+                    System.out.println(file.getId());
+                    System.out.println(file.getPermissions());
+                }
+
+                drive.permissions().delete("1pvvrsWAhV7_XKe8-lHT5oatnFQZucgUrzWXnKKbn2Dg", "11652920652362738064").execute();
+
+//                File fileMetadata = new File();
+//                fileMetadata.setName("My Report");
+//                fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
+//
+//                File file = drive.files().create(fileMetadata)
+//                        .setFields("*")
+//                        .execute();
+//                System.out.println("File ID: " + file.getId());
+//
+//
+//                BatchRequest batch = drive.batch();
+//                Permission userPermission = new Permission().setType("user").setRole("owner").setEmailAddress("langquet@gmail.com");
+//                drive.permissions().create(file.getId(),userPermission).setTransferOwnership(true).setFields("*").queue(batch,callback);
+//                batch.execute();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return classRepository.findAll();
+
     }
 
     public void joinClassByCode(String classCode) {
@@ -42,8 +106,8 @@ public class ClassServiceImpl implements ClassService {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
         Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent()){
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        if (user.isPresent()) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "User not found", "User", ErrorConstants.USER_NOT_FOUND);
         }
         List<String> listMemberId = classObject.getListMemeberId();
         if (!(listMemberId.contains(userId) || classObject.getCoach().equals(userId))) {
@@ -83,11 +147,13 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
-    public void updateClass(String classCode) {
+    public void updateClass(String classCode, Class classContents) {
         Class classObject = findByCode(classCode);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
+        classObject.setClassName(classContents.getClassName());
+        classObject.setClassDescription(classContents.getClassDescription());
         classRepository.save(classObject);
     }
 
@@ -123,9 +189,9 @@ public class ClassServiceImpl implements ClassService {
 
         List<User> listMembers = null;
         Optional<User> user;
-        for (String id: listMemberId){
+        for (String id : listMemberId) {
             user = userRepository.findById(id);
-            if(user.isPresent())
+            if (user.isPresent())
                 listMembers.add(user.get());
         }
         return listMembers;

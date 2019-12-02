@@ -9,6 +9,7 @@ import com.thanhld.server959.payload.LoginRequest;
 import com.thanhld.server959.payload.SignUpRequest;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.security.TokenProvider;
+import com.thanhld.server959.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,10 +26,10 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthResource {
 
-    private static final String HOST = "http://localhost:8080/auth/oauth2/callback";
+    @Autowired
+    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
