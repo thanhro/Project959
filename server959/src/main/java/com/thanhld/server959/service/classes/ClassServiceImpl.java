@@ -1,12 +1,7 @@
 package com.thanhld.server959.service.classes;
 
-import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
-import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.Permission;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
@@ -46,58 +41,7 @@ public class ClassServiceImpl implements ClassService {
     private GoogleDriveServiceUtils googleDriveServiceUtils;
 
     public List<Class> findAllClass() {
-        try {
-            Drive drive = googleDriveServiceUtils.getService();
-
-            JsonBatchCallback<Permission> callback = new JsonBatchCallback<Permission>() {
-                @Override
-                public void onSuccess(Permission permission, HttpHeaders httpHeaders) throws IOException {
-                    System.out.println("Permission ID: " + permission.getId());
-                }
-
-                @Override
-                public void onFailure(GoogleJsonError googleJsonError, HttpHeaders httpHeaders) throws IOException {
-                    System.err.println(googleJsonError.getMessage());
-                }
-            };
-            try {
-                FileList fileList = drive.files().list()
-                        .setFields("nextPageToken, files(*)")
-                        .execute();
-                List<File> files = fileList.getFiles();
-                for (File file : files) {
-                    System.out.println(file.getId());
-                    System.out.println(file.getPermissions());
-                }
-
-                drive.permissions().delete("1pvvrsWAhV7_XKe8-lHT5oatnFQZucgUrzWXnKKbn2Dg", "11652920652362738064").execute();
-
-//                File fileMetadata = new File();
-//                fileMetadata.setName("My Report");
-//                fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
-//
-//                File file = drive.files().create(fileMetadata)
-//                        .setFields("*")
-//                        .execute();
-//                System.out.println("File ID: " + file.getId());
-//
-//
-//                BatchRequest batch = drive.batch();
-//                Permission userPermission = new Permission().setType("user").setRole("owner").setEmailAddress("langquet@gmail.com");
-//                drive.permissions().create(file.getId(),userPermission).setTransferOwnership(true).setFields("*").queue(batch,callback);
-//                batch.execute();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return classRepository.findAll();
-
     }
 
     public void joinClassByCode(String classCode) {
