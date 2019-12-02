@@ -41,9 +41,9 @@ public class AssignmentServiceImpl implements AssignmentService {
             fileMetaData.setName(assignmentName);
             fileMetaData.setMimeType("application/vnd.google-apps.folder");
             fileMetaData.setParents(Collections.singletonList(folderParent.getId()));
-            String webViewLinkAssignment = googleDriveServiceUtils.getService().files().create(fileMetaData).setFields("*").execute().getWebViewLink();
-            googleDriveService.changeOwnerPermissionToCurrentUser(fileMetaData);
-            return webViewLinkAssignment;
+            File file = googleDriveServiceUtils.getService().files().create(fileMetaData).setFields("*").execute();
+            googleDriveService.changeOwnerPermissionToCurrentUser(file);
+            return file.getWebViewLink();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -57,7 +57,7 @@ public class AssignmentServiceImpl implements AssignmentService {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not existed", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
         String coach = SecurityUtils.getCurrentUserLogin().get().getId();
-        if (classRepository.findByNameAndCoach(classCode, coach) == null) {
+        if (classRepository.findByCodeAndCoach(classCode, coach) == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_EXISTED, "User not have permission", "User", ErrorConstants.USER_NOT_HAVE_PERMISSION);
         }
         if (assignmentRepository.findByNameAndClassCode(assignment.getAssignmentName(), classCode) != null) {

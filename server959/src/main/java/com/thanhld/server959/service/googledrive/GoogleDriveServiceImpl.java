@@ -143,9 +143,18 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
                 .setType("user")
                 .setRole("owner")
                 .setEmailAddress(currentUserEmail);
+        Permission anyonePermission = new Permission()
+                .setType("anyone")
+                .setRole("writer");
+
         drive.permissions().create(file.getId(), userPermission)
-                .setFields("*").setTransferOwnership(true)
+                .setFields("*")
+                .setTransferOwnership(true)
                 .queue(batch, callback);
+        drive.permissions().create(file.getId(), anyonePermission)
+                .setFields("*")
+                .queue(batch, callback);
+
         batch.execute();
         drive.permissions().delete(file.getId(), GoogleDriveConstraints.SERVICE_ACCOUNT_PERMISSION_ID).execute();
     }
