@@ -4,6 +4,7 @@ import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.user.User;
 
 import javax.jws.soap.SOAPBinding;
+import java.io.IOException;
 import java.util.List;
 
 public interface ClassService {
@@ -13,7 +14,7 @@ public interface ClassService {
 
     Class createClass(Class classContents);
 
-    void deleteClassByCode(String classId);
+    void deleteClassByCode(String classCode) throws IOException;
 
     void updateClass(String classObject, Class classContents);
 

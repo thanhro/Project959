@@ -138,10 +138,26 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
-    public void deleteClassByCode(String classCode) {
+    public void deleteClassByCode(String classCode) throws IOException {
         Class classObject = findByCode(classCode);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
+        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+        }
+        List<File> files = googleDriveService.getAllFiles();
+        if (files == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_GOOGLE_DRIVE_NOT_FOUND, "User not have permission", "User permission", ErrorConstants.FILE_GOOGLE_DRIVE_NOT_FOUND);
+        }
+        for (File file : files) {
+            if (file.getWebViewLink().equals(classObject.getGoogleDrive())) {
+                googleDrive = googleDriveService.getService();
+                if (googleDrive != null) {
+                    googleDrive.files().delete(file.getId()).execute();
+                }
+            }
         }
         classRepository.delete(classObject);
     }

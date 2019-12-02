@@ -27,6 +27,18 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     @Autowired
     GoogleDriveServiceUtils googleDriveServiceUtils;
 
+    @Override
+    public Drive getService() {
+        try {
+            return googleDriveServiceUtils.getService();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<File> getAllFiles() {
         try {
             Drive drive = googleDriveServiceUtils.getService();
@@ -140,7 +152,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         BatchRequest batch = drive.batch();
         Permission userPermission = new Permission()
                 .setType("user")
-                .setRole("owner")
+                .setRole("writer")
                 .setEmailAddress(currentUserEmail);
         Permission anyonePermission = new Permission()
                 .setType("anyone")
@@ -148,14 +160,13 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
         drive.permissions().create(file.getId(), userPermission)
                 .setFields("*")
-                .setTransferOwnership(true)
                 .queue(batch, callback);
         drive.permissions().create(file.getId(), anyonePermission)
                 .setFields("*")
                 .queue(batch, callback);
 
         batch.execute();
-        drive.permissions().delete(file.getId(), GoogleDriveConstraints.SERVICE_ACCOUNT_PERMISSION_ID).execute();
+//        drive.permissions().delete(file.getId(), GoogleDriveConstraints.SERVICE_ACCOUNT_PERMISSION_ID).execute();
     }
 
 }

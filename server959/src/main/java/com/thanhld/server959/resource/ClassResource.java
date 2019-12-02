@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +46,14 @@ public class ClassResource {
         return ResponseObjectFactory.toResult(classObject.getGoogleDrive(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/class/{classCode}")
-    public ResponseEntity<Void> deleteClassByCode(@PathVariable("classCode") String classCode) {
-        classService.deleteClassByCode(classCode);
+    @DeleteMapping("/class")
+    public ResponseEntity<Void> deleteClassByCode(@RequestParam("classCode") String classCode) {
+        try {
+            classService.deleteClassByCode(classCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseObjectFactory.toResult("Eror", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 
