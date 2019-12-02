@@ -7,13 +7,13 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
-import com.thanhld.server959.config.GoogleDriveServiceConfig;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.user.User;
 import com.thanhld.server959.model.utils.RandomCodeFactory;
 import com.thanhld.server959.repository.ClassRepository;
 import com.thanhld.server959.repository.UserRepository;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
+import com.thanhld.server959.service.googledrive.GoogleDriveServiceUtils;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
@@ -43,11 +43,11 @@ public class ClassServiceImpl implements ClassService {
     private Drive googleDrive;
 
     @Autowired
-    private GoogleDriveServiceConfig googleDriveServiceConfig;
+    private GoogleDriveServiceUtils googleDriveServiceUtils;
 
     public List<Class> findAllClass() {
         try {
-            Drive drive = googleDriveServiceConfig.getService();
+            Drive drive = googleDriveServiceUtils.getService();
 
             JsonBatchCallback<Permission> callback = new JsonBatchCallback<Permission>() {
                 @Override

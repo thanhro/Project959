@@ -37,10 +37,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
             if (files == null || files.isEmpty()) {
                 return null;
             }
-            for (File file: files){
-                System.out.println(file.getName());
-            }
-
+            return files;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (GeneralSecurityException e) {
