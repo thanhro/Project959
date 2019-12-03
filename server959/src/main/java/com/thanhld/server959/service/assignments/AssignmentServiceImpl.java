@@ -91,7 +91,6 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignmentRepository.deleteAssignmentByLink(assignmentLink);
     }
 
-    //FIXME not handle change assignment name on google drive
     @Override
     public void updateAssignment(Assignment assignment) {
         if (assignment.getLink() == null) {

@@ -108,6 +108,9 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public void updateClass(String classCode, Class classContents) {
+        if (classContents.getGoogleDrive() == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Class link not empty!", "Class Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
+        }
         Class classObject = findByCode(classCode);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
@@ -115,6 +118,11 @@ public class ClassServiceImpl implements ClassService {
         classObject.setClassName(classContents.getClassName());
         classObject.setClassDescription(classContents.getClassDescription());
         classRepository.save(classObject);
+        upateClassName(classContents.getGoogleDrive(), classContents.getClassName());
+    }
+
+    private void upateClassName(String googleDrive, String className) {
+        googleDriveService.updateFileNameByLink(googleDrive, className);
     }
 
     public Class findByCode(String classCode) {
