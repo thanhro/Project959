@@ -16,4 +16,10 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
 
     @Query("{'classCode':?0}")
     Class findByCode(String classCode);
+
+    @Query(value = "{'link' : ?0}", delete = true)
+    void deleteAssignmentByLink(String assignmentLink);
+
+    @Query("{'link':?0}")
+    Assignment findByAssignmentLink(String assignmentLink);
 }

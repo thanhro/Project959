@@ -7,4 +7,6 @@ import java.util.Set;
 public interface AssignmentService {
     String createAssignment(String classCode, Assignment assignment);
     Set<String> getAllUserSharedFileToTeacher(String classCode) throws Exception;
+    void deleteAssignment(String assignmentLink);
+    void updateAssignment(Assignment assignment);
 }

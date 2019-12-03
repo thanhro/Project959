@@ -11,6 +11,8 @@ import java.util.Set;
 public interface GoogleDriveService {
     Drive getService();
 
+    void deleteFileByLink(String link);
+
     List<File> getAllFiles();
 
     List<String> getAllFileNames();
@@ -26,4 +28,6 @@ public interface GoogleDriveService {
     File getFolderByWebViewLink(String webViewLink) throws Exception;
 
     void changeOwnerPermissionToCurrentUser(File file) throws GeneralSecurityException, IOException;
+
+    void updateFileNameByLink(String link, String targetName);
 }

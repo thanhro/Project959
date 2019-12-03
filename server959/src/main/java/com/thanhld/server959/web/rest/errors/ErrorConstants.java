@@ -10,6 +10,7 @@ public final class ErrorConstants {
     public static final URI DEFAULT_TYPE = URI.create(PROBLEM_BASE_URL + "/problem-with-message");
     public static final URI NO_DATA_TYPE = URI.create(PROBLEM_BASE_URL + "/no-data");
     public static final URI ENTITY_NOT_FOUND = URI.create(PROBLEM_BASE_URL + "/entity-not-found");
+    public static final URI ENTITY_PROPERTY_NOT_FOUND = URI.create(PROBLEM_BASE_URL + "/entity-property-not-found");
     public static final URI ENTITY_GOOGLE_DRIVE_NOT_FOUND = URI.create(PROBLEM_BASE_URL + "/entity-google-drive-not-found");
     public static final URI ENTITY_NOT_HAVE_PERMISSION = URI.create(PROBLEM_BASE_URL + "/entity-not-have-permission");
     public static final URI ENTITY_EXISTED = URI.create(PROBLEM_BASE_URL + "/entity-existed");
@@ -38,6 +39,7 @@ public final class ErrorConstants {
     public static final int ASSIGNMENT_NOT_FOUND = 512;
     public static final int USER_NOT_HAVE_PERMISSION = 513;
     public static final int FILE_GOOGLE_DRIVE_NOT_FOUND = 514;
+    public static final int ASSIGNMENT_PROPERTY_NOT_FOUND= 515;
 
     private ErrorConstants() {
     }

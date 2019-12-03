@@ -18,10 +18,25 @@ public class AssignmentResource {
     @Autowired
     AssignmentService assignmentService;
 
+    // create assignment
     @PostMapping(value = "/assignment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAssignment(@RequestParam("classCode") String classCode, @RequestBody Assignment assignmentContents) {
         String folderAssignmentLink = assignmentService.createAssignment(classCode, assignmentContents);
         return ResponseObjectFactory.toResult(folderAssignmentLink, HttpStatus.OK);
+    }
+
+    // delete assignment by link
+    @DeleteMapping(value = "/assignment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteAssignment(@RequestBody Assignment assignment) {
+        assignmentService.deleteAssignment(assignment.getLink());
+        return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
+    }
+
+    //update assignment by link (request body: assigmentLink, assignmentName, assignmentDescription, dueDate)
+    @PutMapping(value = "/assignment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateAssignment(@RequestBody Assignment assignment) {
+        assignmentService.updateAssignment(assignment);
+        return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
     }
 
     @GetMapping(value = "")

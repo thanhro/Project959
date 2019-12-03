@@ -81,4 +81,32 @@ public class AssignmentServiceImpl implements AssignmentService {
         }
         return googleDriveService.getAllOwnersSharedFileToTeacher();
     }
+
+    @Override
+    public void deleteAssignment(String assignmentLink) {
+        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
+        }
+        googleDriveService.deleteFileByLink(assignmentLink);
+        assignmentRepository.deleteAssignmentByLink(assignmentLink);
+    }
+
+    //FIXME not handle change assignment name on google drive
+    @Override
+    public void updateAssignment(Assignment assignment) {
+        if (assignment.getLink() == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
+        }
+
+        Assignment assignmentObject = assignmentRepository.findByAssignmentLink(assignment.getLink());
+        assignmentObject.setAssignmentName(assignment.getAssignmentName());
+        assignmentObject.setAssignmentDescriptions(assignment.getAssignmentDescriptions());
+        assignmentObject.setDueDate(assignment.getDueDate());
+        assignmentRepository.save(assignmentObject);
+        updateAssignmentFileName(assignment.getLink(), assignment.getAssignmentName());
+    }
+
+    private void updateAssignmentFileName(String assignmentLink, String assignmentName) {
+        googleDriveService.updateFileNameByLink(assignmentLink, assignmentName);
+    }
 }

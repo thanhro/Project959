@@ -2,6 +2,7 @@ package com.thanhld.server959.model.assignment;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.thanhld.server959.model.AbstractModel;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class Assignment extends AbstractModel {
     private String assignmentDescriptions;
 
     private String dueDate;
+    @JsonProperty("assignmentLink")
     private String link;
     private String classCode;
     private String createdAt;
@@ -31,10 +33,15 @@ public class Assignment extends AbstractModel {
         this.createdAt = createdAt;
     }
 
-    @JsonCreator
-    Assignment(@JsonProperty("assignmentName") String assignmentName, @JsonProperty("assignmentDescriptions") String assignmentDescriptions, @JsonProperty("dueDate") String dueDate) {
-        this.assignmentName = assignmentName;
-        this.assignmentDescriptions = assignmentDescriptions;
-        this.dueDate = dueDate;
-    }
+//    @JsonCreator
+//    Assignment(@JsonProperty("assignmentName") String assignmentName, @JsonProperty("assignmentDescriptions") String assignmentDescriptions, @JsonProperty("dueDate") String dueDate) {
+//        this.assignmentName = assignmentName;
+//        this.assignmentDescriptions = assignmentDescriptions;
+//        this.dueDate = dueDate;
+//    }
+//
+//    @JsonCreator
+//    Assignment(@JsonProperty("assignmentLink") String assignmentLink) {
+//        this.link = assignmentLink;
+//    }
 }

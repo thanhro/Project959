@@ -9,12 +9,11 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
 import com.google.api.services.drive.model.User;
-import com.thanhld.server959.constraints.GoogleDriveConstraints;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,6 +36,28 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void deleteFileByLink(String link) {
+        List<File> files = getAllFiles();
+        if (files == null)
+            return;
+        for (File file : files) {
+            if (file.getWebViewLink().equals(link)) {
+                Drive googleDrive = null;
+                try {
+                    googleDrive = googleDriveServiceUtils.getService();
+                    if (googleDrive != null) {
+                        googleDrive.files().delete(file.getId()).execute();
+                    }
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public List<File> getAllFiles() {
@@ -98,10 +119,10 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         if (fileList == null)
             return null;
         Set<String> ownersSharedFileToTeacher = new HashSet<>();
-        for (File file : fileList.getFiles()){
+        for (File file : fileList.getFiles()) {
             List<User> owners = file.getOwners();
-            for (User owner: owners){
-                if(owner.getEmailAddress().equals(currentEmail))
+            for (User owner : owners) {
+                if (owner.getEmailAddress().equals(currentEmail))
                     continue;
                 ownersSharedFileToTeacher.add(owner.getDisplayName());
             }
@@ -124,8 +145,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         if (fileList == null)
             return null;
         File folder = null;
-        for (File file : fileList.getFiles()){
-            if (file.getWebViewLink().equals(webViewLink) )
+        for (File file : fileList.getFiles()) {
+            if (file.getWebViewLink().equals(webViewLink))
                 folder = file;
         }
         return folder;
@@ -141,6 +162,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
                 // Handle error
                 System.err.println(e.getMessage());
             }
+
             @Override
             public void onSuccess(Permission permission,
                                   HttpHeaders responseHeaders)
@@ -167,6 +189,29 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
         batch.execute();
 //        drive.permissions().delete(file.getId(), GoogleDriveConstraints.SERVICE_ACCOUNT_PERMISSION_ID).execute();
+    }
+
+    @Override
+    public void updateFileNameByLink(String link, String targetName) {
+        Drive drive = null;
+        try {
+            drive = googleDriveServiceUtils.getService();
+            FileList fileList = drive.files().list()
+                    .setFields("files(id,name,webViewLink)")
+                    .execute();
+            if (fileList == null)
+                return;
+            for (File file : fileList.getFiles()) {
+                if (file.getWebViewLink().equals(link)) {
+                    drive.files().update(file.getId(), file).execute();
+                }
+            }
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
