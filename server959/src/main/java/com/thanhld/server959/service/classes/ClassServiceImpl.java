@@ -115,13 +115,17 @@ public class ClassServiceImpl implements ClassService {
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
+        String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
+        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+        }
         classObject.setClassName(classContents.getClassName());
         classObject.setClassDescription(classContents.getClassDescription());
         classRepository.save(classObject);
-        upateClassName(classContents.getGoogleDrive(), classContents.getClassName());
+        updateClassName(classContents.getGoogleDrive(), classContents.getClassName());
     }
 
-    private void upateClassName(String googleDrive, String className) {
+    private void updateClassName(String googleDrive, String className) {
         googleDriveService.updateFileNameByLink(googleDrive, className);
     }
 
