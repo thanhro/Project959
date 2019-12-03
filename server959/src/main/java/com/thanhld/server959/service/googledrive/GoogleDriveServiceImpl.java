@@ -203,7 +203,9 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
                 return;
             for (File file : fileList.getFiles()) {
                 if (file.getWebViewLink().equals(link)) {
-                    drive.files().update(file.getId(), file).execute();
+                    File newContent = new File();
+                    newContent.setName(targetName);
+                    drive.files().update(file.getId(), newContent).execute();
                 }
             }
         } catch (GeneralSecurityException e) {
