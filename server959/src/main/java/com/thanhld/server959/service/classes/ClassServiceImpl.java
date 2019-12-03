@@ -41,7 +41,15 @@ public class ClassServiceImpl implements ClassService {
     private GoogleDriveServiceUtils googleDriveServiceUtils;
 
     public List<Class> findAllClass() {
-        return classRepository.findAll();
+        List<Class> listClasses = classRepository.findAll();
+        List<Class> listClassesByUser = new ArrayList<>();
+        String userId = SecurityUtils.getCurrentUserLogin().get().getId();
+        for(Class classObject : listClasses){
+            if(userId.equals(classObject.getCoach()) || (classObject.getListMemeberId()).contains(userId)){
+                listClassesByUser.add(classObject);
+            }
+        }
+        return listClassesByUser;
     }
 
     public void joinClassByCode(String classCode) {
