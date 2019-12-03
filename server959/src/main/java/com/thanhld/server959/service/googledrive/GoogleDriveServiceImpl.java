@@ -111,24 +111,68 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return file.getWebViewLink();
     }
 
-    @Override
-    public Set<String> getAllOwnersSharedFileToTeacher() throws IOException, GeneralSecurityException {
-        Drive drive = googleDriveServiceUtils.getService();
-        String currentEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
-        FileList fileList = drive.files().list().setFields("*").setQ("mimeType = 'application/vnd.google-apps.document'").execute();
-        if (fileList == null)
-            return null;
-        Set<String> ownersSharedFileToTeacher = new HashSet<>();
+    private String getParentFileIdFromWebViewLink(FileList fileList, String parentFileWebViewLink) throws IOException {
+        String parentFileId = "";
         for (File file : fileList.getFiles()) {
-            List<User> owners = file.getOwners();
-            for (User owner : owners) {
-                if (owner.getEmailAddress().equals(currentEmail))
-                    continue;
-                ownersSharedFileToTeacher.add(owner.getDisplayName());
+            if (file.getWebViewLink().equals(parentFileWebViewLink)) {
+                parentFileId = file.getId();
             }
         }
-        return ownersSharedFileToTeacher;
+        return parentFileId;
     }
+
+    private FileList getFileList() throws GeneralSecurityException, IOException {
+        Drive drive = googleDriveServiceUtils.getService();
+
+        FileList fileList = drive.files().list().setFields("*").execute();//setQ("mimeType = 'application/vnd.google-apps.document'")
+        if (fileList == null)
+            return null;
+
+        return fileList;
+    }
+
+
+    //
+    @Override
+    public Set<String> getAllDisplayNameInParentFile(String parentFileWebViewLink) throws IOException, GeneralSecurityException {
+        FileList fileList = getFileList();
+        String parentFileId = getParentFileIdFromWebViewLink(fileList, parentFileWebViewLink);
+        Set<String> studentNames = new HashSet<>();
+        for (File file : fileList.getFiles()) {
+            List<String> parents = file.getParents();
+            if (parents != null) {
+                for (String parent : parents) {
+                    if (parent.equals(parentFileId)) {
+                        List<User> users = file.getOwners();
+                        studentNames.add(users.get(0).getDisplayName());
+                    }
+                }
+            }
+        }
+
+        return studentNames;
+    }
+
+
+    @Override
+    public Set<String> getAllWebViewLinkInParentFile(String parentFileWebViewLink) throws GeneralSecurityException, IOException {
+        FileList fileList = getFileList();
+        String parentFileId = getParentFileIdFromWebViewLink(fileList, parentFileWebViewLink);
+        Set<String> studentWebViewLinks = new HashSet<>();
+        for (File file : fileList.getFiles()) {
+            List<String> parents = file.getParents();
+            if (parents != null) {
+                for (String parent : parents) {
+                    if (parent.equals(parentFileId)) {
+                        studentWebViewLinks.add(file.getWebViewLink());
+                    }
+                }
+            }
+        }
+
+        return studentWebViewLinks;
+    }
+
 
     public List<String> getAllFileNames() {
         List<String> fileNames = new ArrayList<>();
@@ -215,5 +259,4 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         }
 
     }
-
 }

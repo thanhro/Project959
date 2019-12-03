@@ -23,11 +23,13 @@ public interface GoogleDriveService {
 
     String createFolder(String assignmentName) throws GeneralSecurityException, IOException;
 
-    Set<String> getAllOwnersSharedFileToTeacher() throws Exception;
+    Set<String> getAllDisplayNameInParentFile(String parentFileWebViewLink) throws Exception;
 
     File getFolderByWebViewLink(String webViewLink) throws Exception;
 
     void changeOwnerPermissionToCurrentUser(File file) throws GeneralSecurityException, IOException;
 
     void updateFileNameByLink(String link, String targetName);
+
+    Set<String> getAllWebViewLinkInParentFile(String parentFileWebViewLink) throws GeneralSecurityException, IOException;
 }

@@ -39,9 +39,17 @@ public class AssignmentResource {
         return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
     }
 
-    @GetMapping(value = "")
-    public ResponseEntity<Set<String>> getAllUserSharedFileToTeacher(@RequestParam("classCode") String classCode) throws Exception {
-        Set<String> users = assignmentService.getAllUserSharedFileToTeacher(classCode);
+    // get all userName by assignment link (@RequestBody required assignmentLink value)
+    @GetMapping(value = "/usernames", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<String>> getAllUserSharedFileToTeacher(@RequestBody Assignment assignment) throws Exception {
+        Set<String> users = assignmentService.getAllUserSharedFileToTeacher(assignment.getLink());
+        return ResponseObjectFactory.toResult(users, HttpStatus.OK);
+    }
+
+    // get all user docs link by assignment link (@RequestBody required assignmentLink value)
+    @GetMapping(value = "/userdocs", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<String>> getAllUserDocsLinkSharedToTeacher(@RequestBody Assignment assignment) throws Exception {
+        Set<String> users = assignmentService.getAllUserDocsLinkSharedToTeacher(assignment.getLink());
         return ResponseObjectFactory.toResult(users, HttpStatus.OK);
     }
 }

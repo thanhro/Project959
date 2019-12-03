@@ -14,6 +14,8 @@ import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -75,11 +77,15 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public Set<String> getAllUserSharedFileToTeacher(String classCode) throws Exception {
-        if (assignmentRepository.findByCode(classCode) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.CLASS_NOT_FOUND);
+    public Set<String> getAllUserSharedFileToTeacher(String assignmentLink) throws Exception {
+        if (assignmentLink == null || assignmentLink.isEmpty()) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
         }
-        return googleDriveService.getAllOwnersSharedFileToTeacher();
+
+        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
+        }
+        return googleDriveService.getAllDisplayNameInParentFile(assignmentLink);
     }
 
     @Override
@@ -93,8 +99,12 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public void updateAssignment(Assignment assignment) {
-        if (assignment.getLink() == null) {
+        if (assignment.getLink() == null || assignment.getLink().isEmpty()) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
+        }
+
+        if (assignmentRepository.findByAssignmentLink(assignment.getLink()) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
         }
 
         Assignment assignmentObject = assignmentRepository.findByAssignmentLink(assignment.getLink());
@@ -103,6 +113,18 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignmentObject.setDueDate(assignment.getDueDate());
         assignmentRepository.save(assignmentObject);
         updateAssignmentFileName(assignment.getLink(), assignment.getAssignmentName());
+    }
+
+    @Override
+    public Set<String> getAllUserDocsLinkSharedToTeacher(String assignmentLink) throws GeneralSecurityException, IOException {
+        if (assignmentLink == null || assignmentLink.isEmpty()) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
+        }
+
+        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
+        }
+        return googleDriveService.getAllWebViewLinkInParentFile(assignmentLink);
     }
 
     private void updateAssignmentFileName(String assignmentLink, String assignmentName) {
