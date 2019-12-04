@@ -139,15 +139,18 @@ public class ClassServiceImpl implements ClassService {
     @Override
     public List<User> getAllClassMembers(String classCode) {
         Class classObject = findByCode(classCode);
+        List<User> listMembers = new ArrayList<>();
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
+        String coachClass =classObject.getCoach();
+        Optional<User> userCoach = userRepository.findById(coachClass);
+        listMembers.add(userCoach.get());
 
         List<String> listMemberId = classObject.getListMemeberId();
         if (listMemberId == null || listMemberId.isEmpty())
             return null;
 
-        List<User> listMembers = new ArrayList<>();
         Optional<User> user;
         for (String id : listMemberId) {
             user = userRepository.findById(id);
