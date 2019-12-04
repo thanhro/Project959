@@ -8,14 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AssignmentRepository extends MongoRepository<Assignment, String> {
-    @Query("{'assignmentName':?0}")
-    Class findByName(String assignmentName);
 
     @Query("{'assignmentName':?0, 'classCode':?1}")
-    Class findByNameAndClassCode(String assignmentName, String classCode);
-
-    @Query("{'classCode':?0}")
-    Class findByCode(String classCode);
+    Assignment findByNameAndClassCode(String assignmentName, String classCode);
 
     @Query(value = "{'link' : ?0}", delete = true)
     void deleteAssignmentByLink(String assignmentLink);

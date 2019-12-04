@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
@@ -77,37 +75,18 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public Set<String> getAllUserSharedFileToTeacher(String assignmentLink) throws Exception {
-        if (assignmentLink == null || assignmentLink.isEmpty()) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
-        }
-
-        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
-        }
-        return googleDriveService.getAllDisplayNameInParentFile(assignmentLink);
-    }
-
-    @Override
-    public void deleteAssignment(String assignmentLink) {
-        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
-        }
+    public void deleteAssignment(String assignmentName, String classCode) {
+        boolean isTeacher = isTeacher(classCode);
+        Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
+        String assignmentLink = assignment.getLink();
         googleDriveService.deleteFileByLink(assignmentLink);
         assignmentRepository.deleteAssignmentByLink(assignmentLink);
     }
 
     @Override
-    public void updateAssignment(Assignment assignment) {
-        if (assignment.getLink() == null || assignment.getLink().isEmpty()) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
-        }
-
-        if (assignmentRepository.findByAssignmentLink(assignment.getLink()) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
-        }
-
-        Assignment assignmentObject = assignmentRepository.findByAssignmentLink(assignment.getLink());
+    public void updateAssignment(Assignment assignment, String classCode) {
+        boolean isTeacher = isTeacher(classCode);
+        Assignment assignmentObject = validateAssignmentByNameAndClassCode(assignment.getAssignmentName(), classCode, isTeacher);
         assignmentObject.setAssignmentName(assignment.getAssignmentName());
         assignmentObject.setAssignmentDescriptions(assignment.getAssignmentDescriptions());
         assignmentObject.setDueDate(assignment.getDueDate());
@@ -116,18 +95,65 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public Set<String> getAllUserDocsLinkSharedToTeacher(String assignmentLink) throws GeneralSecurityException, IOException {
-        if (assignmentLink == null || assignmentLink.isEmpty()) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Assignment link not empty!", "Assignment Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
+    public Set<String> getAllUserSharedFileToTeacher(String assignmentName, String classCode) throws Exception {
+        boolean isTeacher = isTeacher(classCode);
+        Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
+        if (isTeacher) {
+            return googleDriveService.getAllDisplayNameInParentFile(assignment.getLink());
         }
+        Set<String> userNames = googleDriveService.getAllDisplayNameInParentFile(assignment.getLink());
 
-        if (assignmentRepository.findByAssignmentLink(assignmentLink) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not existed", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
+        String userName = userNames.stream().filter(SecurityUtils.getCurrentUserLogin().get().getUsername()::equals).findAny().orElse(null);
+        Set<String> userSet = new HashSet<>();
+        userSet.add(userName);
+        return userSet;
+    }
+
+
+    @Override
+    public Set<String> getAllUserDocsLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException {
+        boolean isTeacher = isTeacher(classCode);
+        Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
+        return googleDriveService.getAllWebViewLinkInParentFile(assignment.getLink());
+    }
+
+    @Override
+    public Map<String, String> getAllUserDocsAndLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException {
+        boolean isTeacher = isTeacher(classCode);
+        Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
+        if (isTeacher) {
+            return googleDriveService.getAllDisplayNameAndWebViewLinkInParentFile(assignment.getLink());
         }
-        return googleDriveService.getAllWebViewLinkInParentFile(assignmentLink);
+        return googleDriveService.getDisplayNameAndWebViewLinkInParentFile(SecurityUtils.getCurrentUserLogin().get().getName(), assignment.getLink());
     }
 
     private void updateAssignmentFileName(String assignmentLink, String assignmentName) {
         googleDriveService.updateFileNameByLink(assignmentLink, assignmentName);
+    }
+
+    private Assignment validateAssignmentByNameAndClassCode(String assignmentName, String classCode, Boolean roleUser) {
+        if (classRepository.findByCode(classCode) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        Assignment assignment = assignmentRepository.findByNameAndClassCode(assignmentName, classCode);
+        if (assignmentRepository.findByNameAndClassCode(assignmentName, classCode) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Assignment not found", "Assignment", ErrorConstants.ASSIGNMENT_NOT_FOUND);
+        }
+        if (roleUser) {
+            String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
+            if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
+                throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+            }
+        }
+        return assignment;
+    }
+
+    private boolean isTeacher(String classCode) {
+        String currentUserId = SecurityUtils.getCurrentUserLogin().get().getId();
+        Class classObject = classRepository.findByCodeAndCoach(classCode, currentUserId);
+        if (classObject != null) {
+            return true;
+        }
+        return false;
     }
 }

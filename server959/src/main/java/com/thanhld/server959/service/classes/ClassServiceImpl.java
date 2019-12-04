@@ -37,15 +37,12 @@ public class ClassServiceImpl implements ClassService {
     @Autowired
     private Drive googleDrive;
 
-    @Autowired
-    private GoogleDriveServiceUtils googleDriveServiceUtils;
-
     public List<Class> findAllClass() {
         List<Class> listClasses = classRepository.findAll();
         List<Class> listClassesByUser = new ArrayList<>();
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
-        for(Class classObject : listClasses){
-            if(userId.equals(classObject.getCoach()) || (classObject.getListMemeberId()).contains(userId)){
+        for (Class classObject : listClasses) {
+            if (userId.equals(classObject.getCoach()) || (classObject.getListMemeberId()).contains(userId)) {
                 listClassesByUser.add(classObject);
             }
         }
@@ -91,14 +88,7 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public void deleteClassByCode(String classCode) throws IOException {
-        Class classObject = findByCode(classCode);
-        if (classObject == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
-        }
-        String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
-        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
-        }
+        Class classObject = validateClassByCode(classCode);
         List<File> files = googleDriveService.getAllFiles();
         if (files == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_GOOGLE_DRIVE_NOT_FOUND, "File not found", "File", ErrorConstants.FILE_GOOGLE_DRIVE_NOT_FOUND);
@@ -116,17 +106,7 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public void updateClass(String classCode, Class classContents) {
-        if (classContents.getGoogleDrive() == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "Class link not empty!", "Class Link", ErrorConstants.ASSIGNMENT_PROPERTY_NOT_FOUND);
-        }
-        Class classObject = findByCode(classCode);
-        if (classObject == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
-        }
-        String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
-        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
-        }
+        Class classObject = validateClassByCode(classCode);
         classObject.setClassName(classContents.getClassName());
         classObject.setClassDescription(classContents.getClassDescription());
         classRepository.save(classObject);
@@ -175,5 +155,17 @@ public class ClassServiceImpl implements ClassService {
                 listMembers.add(user.get());
         }
         return listMembers;
+    }
+
+    private Class validateClassByCode(String classCode) {
+        Class classObject = findByCode(classCode);
+        if (classObject == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
+        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+        }
+        return classObject;
     }
 }

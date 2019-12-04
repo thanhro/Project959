@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GoogleDriveServiceImpl implements GoogleDriveService {
@@ -171,6 +168,37 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         }
 
         return studentWebViewLinks;
+    }
+
+    @Override
+    public Map<String, String> getAllDisplayNameAndWebViewLinkInParentFile(String parentFileWebViewLink) throws GeneralSecurityException, IOException {
+        FileList fileList = getFileList();
+        String parentFileId = getParentFileIdFromWebViewLink(fileList, parentFileWebViewLink);
+        Map<String, String> studentDetails = new HashMap<>();
+        for (File file : fileList.getFiles()) {
+            List<String> parents = file.getParents();
+            if (parents != null) {
+                for (String parent : parents) {
+                    if (parent.equals(parentFileId)) {
+                        if (parent.equals(parentFileId)) {
+                            List<User> users = file.getOwners();
+                            studentDetails.put(users.get(0).getDisplayName(), file.getWebViewLink());
+                        }
+                    }
+                }
+            }
+        }
+        return studentDetails;
+    }
+
+    @Override
+    public Map<String, String> getDisplayNameAndWebViewLinkInParentFile(String currentUserName, String parentFileWebViewLink) throws GeneralSecurityException, IOException {
+        Map<String,String> allUser = getAllDisplayNameAndWebViewLinkInParentFile(parentFileWebViewLink);
+        if (!allUser.containsKey(currentUserName))
+            return null;
+        Map<String, String> userDetails = new HashMap<>();
+        userDetails.put(currentUserName,allUser.get(currentUserName));
+        return userDetails;
     }
 
 

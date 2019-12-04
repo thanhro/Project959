@@ -6,6 +6,7 @@ import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface GoogleDriveService {
@@ -32,4 +33,8 @@ public interface GoogleDriveService {
     void updateFileNameByLink(String link, String targetName);
 
     Set<String> getAllWebViewLinkInParentFile(String parentFileWebViewLink) throws GeneralSecurityException, IOException;
+
+    Map<String, String> getAllDisplayNameAndWebViewLinkInParentFile(String parentFileWebViewLink) throws GeneralSecurityException, IOException;
+
+    Map<String, String> getDisplayNameAndWebViewLinkInParentFile(String currentUserEmail, String parentFileWebViewLink) throws GeneralSecurityException, IOException;
 }
