@@ -201,7 +201,6 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return userDetails;
     }
 
-
     public List<String> getAllFileNames() {
         List<String> fileNames = new ArrayList<>();
         for (File file : getAllFiles()) {

@@ -33,15 +33,4 @@ public class Assignment extends AbstractModel {
         this.createdAt = createdAt;
     }
 
-//    @JsonCreator
-//    Assignment(@JsonProperty("assignmentName") String assignmentName, @JsonProperty("assignmentDescriptions") String assignmentDescriptions, @JsonProperty("dueDate") String dueDate) {
-//        this.assignmentName = assignmentName;
-//        this.assignmentDescriptions = assignmentDescriptions;
-//        this.dueDate = dueDate;
-//    }
-//
-//    @JsonCreator
-//    Assignment(@JsonProperty("assignmentLink") String assignmentLink) {
-//        this.link = assignmentLink;
-//    }
 }
