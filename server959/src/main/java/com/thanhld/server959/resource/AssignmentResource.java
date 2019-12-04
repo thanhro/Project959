@@ -33,28 +33,28 @@ public class AssignmentResource {
         return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
     }
 
-    //update assignment by link (request body: assigmentLink, assignmentName, assignmentDescription, dueDate)
+    //update assignment by assignment classCode (@RequestParam) and assignment(@RequestBody)
     @PutMapping(value = "/assignment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateAssignment(@RequestParam("classCode") String classCode, @RequestBody Assignment assignment) {
         assignmentService.updateAssignment(assignment, classCode);
         return ResponseObjectFactory.toResult("Successfully", HttpStatus.OK);
     }
 
-    // get all userName by assignment link (@RequestBody required assignmentLink value)
+    // get all userName by assignment assignmentName and classCode (@RequestParam)
     @GetMapping(value = "/usernames", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Set<String>> getAllUserSharedFileToTeacher(@RequestParam("assignmentName") String assignmentName, @RequestParam("classCode") String classCode) throws Exception {
         Set<String> users = assignmentService.getAllUserSharedFileToTeacher(assignmentName, classCode);
         return ResponseObjectFactory.toResult(users, HttpStatus.OK);
     }
 
-    // get all user docs link by assignment link (@RequestBody required assignmentLink value)
+    // get all user docs link by assignment assignmentName and classCode (@RequestParam)
     @GetMapping(value = "/userdocs", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Set<String>> getAllUserDocsLinkSharedToTeacher(@RequestParam("assignmentName") String assignmentName, @RequestParam("classCode") String classCode) throws Exception {
         Set<String> users = assignmentService.getAllUserDocsLinkSharedToTeacher(assignmentName, classCode);
         return ResponseObjectFactory.toResult(users, HttpStatus.OK);
     }
 
-    // get all user docs and user name link by assignment link (@RequestBody required assignmentLink value)
+    // get all user docs and user name link by assignment assignmentName and classCode (@RequestParam)
     @GetMapping(value = "/userdetails", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> getAllUserDocsAndLinkSharedToTeacher(@RequestParam("assignmentName") String assignmentName, @RequestParam("classCode") String classCode) throws Exception {
         Map<String, String> users = assignmentService.getAllUserDocsAndLinkSharedToTeacher(assignmentName, classCode);
