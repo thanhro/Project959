@@ -143,6 +143,17 @@ public class AssignmentServiceImpl implements AssignmentService {
         return googleDriveService.getDisplayNameAndWebViewLinkInParentFile(SecurityUtils.getCurrentUserLogin().get().getName(), assignment.getLink());
     }
 
+    @Override
+    public List<Assignment> getAllAssignment(String classCode) {
+        if (classRepository.findByCode(classCode) == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        if (classService.isTeacher(classCode)) {
+            return assignmentRepository.findByClassCode(classCode);
+        }
+        throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+    }
+
     private void updateAssignmentFileName(String assignmentLink, String assignmentName) {
         googleDriveService.updateFileNameByLink(assignmentLink, assignmentName);
     }

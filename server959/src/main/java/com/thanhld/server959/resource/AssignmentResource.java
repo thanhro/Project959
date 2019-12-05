@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,5 +60,11 @@ public class AssignmentResource {
     public ResponseEntity<Map<String, String>> getAllUserDocsAndLinkSharedToTeacher(@RequestParam("assignmentName") String assignmentName, @RequestParam("classCode") String classCode) throws Exception {
         Map<String, String> users = assignmentService.getAllUserDocsAndLinkSharedToTeacher(assignmentName, classCode);
         return ResponseObjectFactory.toResult(users, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Assignment>> getAllAsignment(@RequestParam("classCode") String classCode) throws Exception {
+        List<Assignment> assignments = assignmentService.getAllAssignment(classCode);
+        return ResponseObjectFactory.toResult(assignments, HttpStatus.OK);
     }
 }

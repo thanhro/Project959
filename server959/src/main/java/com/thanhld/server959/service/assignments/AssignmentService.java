@@ -25,4 +25,6 @@ public interface AssignmentService {
     Set<String> getAllUserDocsLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException;
 
     Map<String, String> getAllUserDocsAndLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException;
+
+    List<Assignment> getAllAssignment(String classCode);
 }
