@@ -38,4 +38,7 @@ public interface GoogleDriveService {
 
     Map<String, String> getDisplayNameAndWebViewLinkInParentFile(String currentUserEmail, String parentFileWebViewLink) throws GeneralSecurityException, IOException;
 
+    List<String> getAllWebViewLinkByEmail(String userEmail);
+
+    List<String> getChildrenWebViewLinkByParentWebViewLink(List<String> parentWebViewLinks, String email);
 }

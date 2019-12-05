@@ -21,4 +21,8 @@ public interface ClassService {
     String createFolderClass(String className);
 
     List<User> getAllClassMembers(String classCode);
+
+    boolean isTeacher(String classCode);
+
+    Class findByClassCode(String classCode);
 }

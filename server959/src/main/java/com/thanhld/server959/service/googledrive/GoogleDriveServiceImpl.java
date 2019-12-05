@@ -193,11 +193,25 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Override
     public Map<String, String> getDisplayNameAndWebViewLinkInParentFile(String currentUserName, String parentFileWebViewLink) throws GeneralSecurityException, IOException {
-        Map<String,String> allUser = getAllDisplayNameAndWebViewLinkInParentFile(parentFileWebViewLink);
+        Map<String, String> allUser = getAllDisplayNameAndWebViewLinkInParentFile(parentFileWebViewLink);
         if (!allUser.containsKey(currentUserName))
             return null;
         Map<String, String> userDetails = new HashMap<>();
-        userDetails.put(currentUserName,allUser.get(currentUserName));
+        userDetails.put(currentUserName, allUser.get(currentUserName));
+        return userDetails;
+    }
+
+    @Override
+    public List<String> getAllWebViewLinkByEmail(String userEmail) {
+        List<File> files = getAllFiles();
+        if (files == null)
+            return null;
+        List<String> userDetails = new ArrayList<>();
+        for (File file : files) {
+            if (file.getOwners().get(0).getEmailAddress().equals(userEmail)) {
+                userDetails.add(file.getWebViewLink());
+            }
+        }
         return userDetails;
     }
 
@@ -284,6 +298,37 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
+    @Override
+    public List<String> getChildrenWebViewLinkByParentWebViewLink(List<String> parentWebViewLinks, String email) {
+        List<File> files = getAllFiles();
+        if (files == null)
+            return null;
+
+        List<String> parentIdList = new ArrayList<>();
+        for (File file : files) {
+            for (String webViewLink : parentWebViewLinks) {
+                if (file.getWebViewLink().equals(webViewLink)) {
+                    parentIdList.add(file.getId());
+                }
+            }
+        }
+
+        List<String> childrentLinks = new ArrayList<>();
+        for (File file : files) {
+            for (String parentId : parentIdList) {
+                if (file.getParents() != null && file.getParents().get(0).equals(parentId)) {
+                    List<User> owners = file.getOwners();
+                    for (User user : owners) {
+                        if (user.getEmailAddress().equals(email)) ;
+                        childrentLinks.add(file.getWebViewLink());
+                    }
+                }
+            }
+        }
+
+        return childrentLinks;
+    }
+
 }

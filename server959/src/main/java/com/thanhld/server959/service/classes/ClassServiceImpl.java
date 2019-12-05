@@ -160,13 +160,28 @@ public class ClassServiceImpl implements ClassService {
         return listMembers;
     }
 
+    @Override
+    public boolean isTeacher(String classCode) {
+        String currentUserId = SecurityUtils.getCurrentUserLogin().get().getId();
+        Class classObject = classRepository.findByCodeAndCoach(classCode, currentUserId);
+        if (classObject != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Class findByClassCode(String classCode) {
+        return classRepository.findByCode(classCode);
+    }
+
     private Class validateClassByCode(String classCode) {
         Class classObject = findByCode(classCode);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
         String teacherId = SecurityUtils.getCurrentUserLogin().get().getId();
-        if (classRepository.findByCodeAndCoach(classCode, teacherId) == null) {
+        if (!isTeacher(classCode)) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
         }
         return classObject;

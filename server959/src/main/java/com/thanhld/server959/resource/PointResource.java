@@ -16,7 +16,7 @@ public class PointResource {
     @Autowired
     PointService pointService;
 
-    // create or upodate point by requestBody (link, point)
+    // create or update point by requestBody (link, point)
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createOrUpdatePoint(@RequestParam("classCode") String classCode, @RequestBody Point point) {
         pointService.createPoint(point, classCode);
@@ -28,5 +28,23 @@ public class PointResource {
     public ResponseEntity<String> getPoint(@RequestParam("link") String link) {
         String pointValue = pointService.getPoint(link);
         return ResponseObjectFactory.toResult(pointValue, HttpStatus.OK);
+    }
+
+    // get all assignment point user(student)
+    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getUserPointAssignment() {
+        return ResponseObjectFactory.toResult(pointService.getUserPoints(), HttpStatus.OK);
+    }
+
+    // get all assignment point user(student)
+    @GetMapping(value = "/user/all", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAllUserPointsAssignment(@RequestParam("classCode") String classCode) {
+        return ResponseObjectFactory.toResult(pointService.getUserPoints(), HttpStatus.OK);
+    }
+
+    // get all assignment point user in class
+    @GetMapping(value = "/user/class", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getUserPointsAssignmentInClass(@RequestParam("classCode") String classCode) {
+        return ResponseObjectFactory.toResult(pointService.getUserPointsInClass(classCode), HttpStatus.OK);
     }
 }

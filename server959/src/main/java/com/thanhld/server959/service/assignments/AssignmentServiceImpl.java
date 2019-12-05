@@ -5,6 +5,7 @@ import com.thanhld.server959.model.assignment.Assignment;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.repository.AssignmentRepository;
 import com.thanhld.server959.repository.ClassRepository;
+import com.thanhld.server959.service.classes.ClassService;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
 import com.thanhld.server959.service.googledrive.GoogleDriveServiceUtils;
 import com.thanhld.server959.utils.DateUtils;
@@ -33,6 +34,9 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired
     GoogleDriveServiceUtils googleDriveServiceUtils;
 
+    @Autowired
+    ClassService classService;
+
     private String createFolderAssignment(String assignmentName, String webViewLink) {
         try {
             File folderParent = googleDriveService.getFolderByWebViewLink(webViewLink);
@@ -48,6 +52,11 @@ public class AssignmentServiceImpl implements AssignmentService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public List<Assignment> findByClassCode(String classCode) {
+        return assignmentRepository.findByClassCode(classCode);
     }
 
     @Override
@@ -76,7 +85,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public void deleteAssignment(String assignmentName, String classCode) {
-        boolean isTeacher = isTeacher(classCode);
+        boolean isTeacher = classService.isTeacher(classCode);
         Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
         String assignmentLink = assignment.getLink();
         googleDriveService.deleteFileByLink(assignmentLink);
@@ -85,7 +94,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public void updateAssignment(Assignment assignment, String classCode) {
-        boolean isTeacher = isTeacher(classCode);
+        boolean isTeacher = classService.isTeacher(classCode);
         Assignment assignmentObject = validateAssignmentByNameAndClassCode(assignment.getAssignmentName(), classCode, isTeacher);
         assignmentObject.setAssignmentName(assignment.getAssignmentName());
         assignmentObject.setAssignmentDescriptions(assignment.getAssignmentDescriptions());
@@ -96,7 +105,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public Set<String> getAllUserSharedFileToTeacher(String assignmentName, String classCode) throws Exception {
-        boolean isTeacher = isTeacher(classCode);
+        boolean isTeacher = classService.isTeacher(classCode);
         Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
         if (isTeacher) {
             return googleDriveService.getAllDisplayNameInParentFile(assignment.getLink());
@@ -112,14 +121,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public Set<String> getAllUserDocsLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException {
-        boolean isTeacher = isTeacher(classCode);
+        boolean isTeacher = classService.isTeacher(classCode);
         Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
         return googleDriveService.getAllWebViewLinkInParentFile(assignment.getLink());
     }
 
     @Override
     public Map<String, String> getAllUserDocsAndLinkSharedToTeacher(String assignmentName, String classCode) throws GeneralSecurityException, IOException {
-        boolean isTeacher = isTeacher(classCode);
+        boolean isTeacher = classService.isTeacher(classCode);
         Assignment assignment = validateAssignmentByNameAndClassCode(assignmentName, classCode, isTeacher);
         if (isTeacher) {
             return googleDriveService.getAllDisplayNameAndWebViewLinkInParentFile(assignment.getLink());
@@ -148,12 +157,4 @@ public class AssignmentServiceImpl implements AssignmentService {
         return assignment;
     }
 
-    private boolean isTeacher(String classCode) {
-        String currentUserId = SecurityUtils.getCurrentUserLogin().get().getId();
-        Class classObject = classRepository.findByCodeAndCoach(classCode, currentUserId);
-        if (classObject != null) {
-            return true;
-        }
-        return false;
-    }
 }

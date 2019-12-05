@@ -1,15 +1,21 @@
 package com.thanhld.server959.service.point;
 
+import com.thanhld.server959.model.assignment.Assignment;
 import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.point.Point;
 import com.thanhld.server959.repository.ClassRepository;
 import com.thanhld.server959.repository.PointRespository;
+import com.thanhld.server959.service.assignments.AssignmentService;
+import com.thanhld.server959.service.classes.ClassService;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
 import com.thanhld.server959.web.rest.errors.BadRequestAlertException;
 import com.thanhld.server959.web.rest.errors.ErrorConstants;
 import com.thanhld.server959.web.rest.errors.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PointServiceImpl implements PointService {
@@ -23,10 +29,16 @@ public class PointServiceImpl implements PointService {
     @Autowired
     ClassRepository classRepository;
 
+    @Autowired
+    ClassService classService;
+
+    @Autowired
+    AssignmentService assignmentService;
+
     @Override
     public String getPoint(String userDocLink) {
         Point pointResult = pointRespository.findByLink(userDocLink);
-        if (pointResult == null){
+        if (pointResult == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Google drive not found", "Google drive", ErrorConstants.DRIVE_NOT_FOUND);
         }
         return pointRespository.findByLink(userDocLink).getPoint();
@@ -34,7 +46,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public void createPoint(Point point, String classCode) {
-        if (point.getLink().isEmpty()){
+        if (point.getLink().isEmpty()) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_PROPERTY_NOT_FOUND, "User link not found in request body", "User link", ErrorConstants.CLASS_NOT_FOUND);
         }
         Point pointObject = pointRespository.findByLink(point.getLink());
@@ -42,33 +54,61 @@ public class PointServiceImpl implements PointService {
 //            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Google drive file not found", "Google drive", ErrorConstants.DRIVE_NOT_FOUND);
 //        }
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
-        Class classObject = classRepository.findByCodeAndCoach(classCode,userId);
-        if (classObject == null){
+        Class classObject = classRepository.findByCodeAndCoach(classCode, userId);
+        if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
         }
-        if (!validatePoint(point.getPoint())){
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
-        }
-        if (validatePoint(point.getPoint()) && pointObject!=null){
+        if (validatePoint(point.getPoint()) && pointObject != null) {
             pointObject.setPoint(point.getPoint().trim());
             pointObject.setLink(point.getLink());
             pointRespository.save(pointObject);
             return;
         }
-
-        pointRespository.save(point);
     }
 
-    private boolean validatePoint(String point){
+    @Override
+    public List<Point> getUserPoints() {
+        String userEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
+        return pointRespository.getPointsByWebViewLink(googleDriveService.getAllWebViewLinkByEmail(userEmail));
+    }
+
+    @Override
+    public List<Point> getUserPointsInClass(String classCode) {
+
+        Class classObject = classService.findByClassCode(classCode);
+        if (classObject == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        String userEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
+        List<Assignment> assignmentList = assignmentService.findByClassCode(classCode);
+        List<String> assignmentWebViewLinks = assignmentList.stream().map(link -> link.getLink()).collect(Collectors.toList());
+
+        List<String> userLinks = googleDriveService.getChildrenWebViewLinkByParentWebViewLink(assignmentWebViewLinks, userEmail);
+        return pointRespository.getPointsByWebViewLink(userLinks);
+    }
+
+    @Override
+    public List<Point> getAllUserPoints(String classCode) {
+        Class classObject = classService.findByClassCode(classCode);
+        if (classObject == null) {
+            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
+        }
+        if (classService.isTeacher(SecurityUtils.getCurrentUserLogin().get().getId())) {
+            return pointRespository.findAll();
+        }
+        throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+    }
+
+    private boolean validatePoint(String point) {
         Integer pointObject;
         try {
             pointObject = Integer.parseInt(point);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FORMAL, "Point not formal", "Point", ErrorConstants.POINT_NOT_FORMAL);
         }
 
-        if (pointObject > 100 || pointObject<0){
+        if (pointObject > 100 || pointObject < 0) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FORMAL, "Point not valid", "Point", ErrorConstants.POINT_NOT_FORMAL);
         }
         return true;
