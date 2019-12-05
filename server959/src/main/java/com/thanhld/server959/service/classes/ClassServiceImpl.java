@@ -109,8 +109,9 @@ public class ClassServiceImpl implements ClassService {
         Class classObject = validateClassByCode(classCode);
         classObject.setClassName(classContents.getClassName());
         classObject.setClassDescription(classContents.getClassDescription());
+        Class classTarget = classRepository.findByCode(classCode);
         classRepository.save(classObject);
-        updateClassName(classContents.getGoogleDrive(), classContents.getClassName());
+        updateClassName(classTarget.getGoogleDrive(), classContents.getClassName());
     }
 
     private void updateClassName(String googleDrive, String className) {

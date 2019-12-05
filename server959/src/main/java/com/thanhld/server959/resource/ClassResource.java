@@ -58,8 +58,8 @@ public class ClassResource {
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 
-    @PutMapping("/class/{classCode}")
-    public ResponseEntity<Void> updateClass(@PathVariable("classCode") String classCode, @RequestBody Class classContents) {
+    @PutMapping("/class")
+    public ResponseEntity<Void> updateClass(@RequestParam("classCode") String classCode, @RequestBody Class classContents) {
         classService.updateClass(classCode, classContents);
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
