@@ -107,7 +107,8 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignmentObject.setAssignmentDescriptions(assignment.getAssignmentDescriptions());
         assignmentObject.setDueDate(assignment.getDueDate());
         assignmentRepository.save(assignmentObject);
-        updateAssignmentFileName(assignment.getLink(), assignment.getAssignmentName());
+        Assignment assignmentTarget = assignmentRepository.findByNameAndClassCode(assignment.getAssignmentName(), classCode);
+        updateAssignmentFileName(assignmentTarget.getLink(), assignment.getAssignmentName());
     }
 
     @Override
