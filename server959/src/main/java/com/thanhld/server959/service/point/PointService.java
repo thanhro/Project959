@@ -13,7 +13,5 @@ public interface PointService {
 
     List<Point> getUserPointsInClass(String classCode);
 
-    List<Point> getAllUserPointsInClass(String classCode);
-
     List<Point> getAllUserPoints();
 }

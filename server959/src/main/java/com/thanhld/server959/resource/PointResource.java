@@ -36,13 +36,7 @@ public class PointResource {
         return ResponseObjectFactory.toResult(pointService.getUserPoints(), HttpStatus.OK);
     }
 
-    // get all assignment point user in class(teacher role)
-    @GetMapping(value = "/userpoints/class", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAllUserPointsAssignmentInClass(@RequestParam("classCode") String classCode) {
-        return ResponseObjectFactory.toResult(pointService.getAllUserPointsInClass(classCode), HttpStatus.OK);
-    }
-
-    // get all assignment point user in class(student role)
+    // get all assignment point user in class (student + teacher)
     @GetMapping(value = "/user/class", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getUserPointsAssignmentInClass(@RequestParam("classCode") String classCode) {
         return ResponseObjectFactory.toResult(pointService.getUserPointsInClass(classCode), HttpStatus.OK);

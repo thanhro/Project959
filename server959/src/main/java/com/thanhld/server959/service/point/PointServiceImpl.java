@@ -80,24 +80,16 @@ public class PointServiceImpl implements PointService {
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
+        if (classService.isTeacher(classCode)) {
+            return pointRespository.findAll();
+        }
+
         String userEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
         List<Assignment> assignmentList = assignmentService.findByClassCode(classCode);
         List<String> assignmentWebViewLinks = assignmentList.stream().map(link -> link.getLink()).collect(Collectors.toList());
 
         List<String> userLinks = googleDriveService.getChildrenWebViewLinkByParentWebViewLink(assignmentWebViewLinks, userEmail);
         return pointRespository.getPointsByWebViewLink(userLinks);
-    }
-
-    @Override
-    public List<Point> getAllUserPointsInClass(String classCode) {
-        Class classObject = classService.findByClassCode(classCode);
-        if (classObject == null) {
-            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
-        }
-        if (classService.isTeacher(classCode)) {
-            return pointRespository.findAll();
-        }
-        throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
     }
 
     @Override
