@@ -175,6 +175,11 @@ public class ClassServiceImpl implements ClassService {
         return classRepository.findByCode(classCode);
     }
 
+    @Override
+    public List<Class> findByUserId(String userId) {
+        return classRepository.findByCoach(userId);
+    }
+
     private Class validateClassByCode(String classCode) {
         Class classObject = findByCode(classCode);
         if (classObject == null) {

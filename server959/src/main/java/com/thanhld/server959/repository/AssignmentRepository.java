@@ -1,6 +1,7 @@
 package com.thanhld.server959.repository;
 
 import com.thanhld.server959.model.assignment.Assignment;
+import com.thanhld.server959.model.classes.Class;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,7 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
 
     @Query("{'classCode':?0}")
     List<Assignment> findByClassCode(String classCode);
+
+    @Query("{'classCode':{ '$in' : ?0}}")
+    List<Assignment> findByClassCode(List<String> classCode);
 }

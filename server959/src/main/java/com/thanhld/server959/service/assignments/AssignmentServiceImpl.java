@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
@@ -52,6 +53,12 @@ public class AssignmentServiceImpl implements AssignmentService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public List<Assignment> findByClassCode(List<Class> classes) {
+        List<String> classCode = classes.stream().map(classObject -> classObject.getClassCode()).collect(Collectors.toList());
+        return assignmentRepository.findByClassCode(classCode);
     }
 
     @Override

@@ -305,16 +305,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         List<File> files = getAllFiles();
         if (files == null)
             return null;
-
-        List<String> parentIdList = new ArrayList<>();
-        for (File file : files) {
-            for (String webViewLink : parentWebViewLinks) {
-                if (file.getWebViewLink().equals(webViewLink)) {
-                    parentIdList.add(file.getId());
-                }
-            }
-        }
-
+        List<String> parentIdList = getParentWebViewLinks(files,parentWebViewLinks);
         List<String> childrentLinks = new ArrayList<>();
         for (File file : files) {
             for (String parentId : parentIdList) {
@@ -331,4 +322,33 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return childrentLinks;
     }
 
+    @Override
+    public List<String> getChildrenWebViewLinkByParentWebViewLink(List<String> parentWebViewLinks) {
+        List<File> files = getAllFiles();
+        if (files == null)
+            return null;
+        List<String> parentIdList = getParentWebViewLinks(files,parentWebViewLinks);
+        List<String> childrentLinks = new ArrayList<>();
+        for (File file : files) {
+            for (String parentId : parentIdList) {
+                if (file.getParents() != null && file.getParents().get(0).equals(parentId)) {
+                    childrentLinks.add(file.getWebViewLink());
+                }
+            }
+        }
+
+        return childrentLinks;
+    }
+
+    private List<String> getParentWebViewLinks(List<File> files, List<String> parentWebViewLinks){
+        List<String> parentIdList = new ArrayList<>();
+        for (File file : files) {
+            for (String webViewLink : parentWebViewLinks) {
+                if (file.getWebViewLink().equals(webViewLink)) {
+                    parentIdList.add(file.getId());
+                }
+            }
+        }
+        return parentIdList;
+    }
 }

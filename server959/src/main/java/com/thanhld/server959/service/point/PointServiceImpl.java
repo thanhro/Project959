@@ -5,6 +5,7 @@ import com.thanhld.server959.model.classes.Class;
 import com.thanhld.server959.model.point.Point;
 import com.thanhld.server959.repository.ClassRepository;
 import com.thanhld.server959.repository.PointRespository;
+import com.thanhld.server959.security.UserPrincipal;
 import com.thanhld.server959.service.assignments.AssignmentService;
 import com.thanhld.server959.service.classes.ClassService;
 import com.thanhld.server959.service.googledrive.GoogleDriveService;
@@ -88,15 +89,24 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<Point> getAllUserPoints(String classCode) {
+    public List<Point> getAllUserPointsInClass(String classCode) {
         Class classObject = classService.findByClassCode(classCode);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
-        if (classService.isTeacher(SecurityUtils.getCurrentUserLogin().get().getId())) {
+        if (classService.isTeacher(classCode)) {
             return pointRespository.findAll();
         }
         throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
+    }
+
+    @Override
+    public List<Point> getAllUserPoints() {
+        UserPrincipal userObject = SecurityUtils.getCurrentUserLogin().get();
+        String userId = userObject.getId();
+        List<Class> classes = classService.findByUserId(userId);
+        List<Assignment> assignments = assignmentService.findByClassCode(classes);
+        return pointRespository.getPointsByWebViewLink(googleDriveService.getChildrenWebViewLinkByParentWebViewLink(assignments.stream().map(assignment -> assignment.getLink()).collect(Collectors.toList())));
     }
 
     private boolean validatePoint(String point) {

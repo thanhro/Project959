@@ -25,4 +25,6 @@ public interface ClassService {
     boolean isTeacher(String classCode);
 
     Class findByClassCode(String classCode);
+
+    List<Class> findByUserId(String userId);
 }

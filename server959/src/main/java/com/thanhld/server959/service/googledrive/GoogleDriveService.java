@@ -41,4 +41,6 @@ public interface GoogleDriveService {
     List<String> getAllWebViewLinkByEmail(String userEmail);
 
     List<String> getChildrenWebViewLinkByParentWebViewLink(List<String> parentWebViewLinks, String email);
+
+    List<String> getChildrenWebViewLinkByParentWebViewLink(List<String> parentWebViewLinks);
 }
