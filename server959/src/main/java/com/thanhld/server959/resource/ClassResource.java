@@ -64,8 +64,8 @@ public class ClassResource {
         return ResponseObjectFactory.toResult("Susccessfully", HttpStatus.OK);
     }
 
-    @GetMapping("/class/{classCode}/users")
-    public ResponseEntity<Void> getAllClassMembers(@PathVariable("classCode") String classCode) {
+    @GetMapping("/class/users")
+    public ResponseEntity<Void> getAllClassMembers(@RequestParam("classCode") String classCode) {
         List<User> listUser = classService.getAllClassMembers(classCode);
         return ResponseObjectFactory.toResult(listUser, HttpStatus.OK);
     }
