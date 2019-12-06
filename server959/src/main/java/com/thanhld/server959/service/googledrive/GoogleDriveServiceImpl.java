@@ -305,15 +305,15 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         List<File> files = getAllFiles();
         if (files == null)
             return null;
-        List<String> parentIdList = getParentWebViewLinks(files,parentWebViewLinks);
+        List<String> parentIdList = getParentWebViewLinks(files, parentWebViewLinks);
         List<String> childrentLinks = new ArrayList<>();
         for (File file : files) {
             for (String parentId : parentIdList) {
                 if (file.getParents() != null && file.getParents().get(0).equals(parentId)) {
                     List<User> owners = file.getOwners();
                     for (User user : owners) {
-                        if (user.getEmailAddress().equals(email)) ;
-                        childrentLinks.add(file.getWebViewLink());
+                        if (user.getEmailAddress().equals(email))
+                            childrentLinks.add(file.getWebViewLink());
                     }
                 }
             }
@@ -327,7 +327,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         List<File> files = getAllFiles();
         if (files == null)
             return null;
-        List<String> parentIdList = getParentWebViewLinks(files,parentWebViewLinks);
+        List<String> parentIdList = getParentWebViewLinks(files, parentWebViewLinks);
         List<String> childrentLinks = new ArrayList<>();
         for (File file : files) {
             for (String parentId : parentIdList) {
@@ -340,7 +340,23 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return childrentLinks;
     }
 
-    private List<String> getParentWebViewLinks(List<File> files, List<String> parentWebViewLinks){
+    @Override
+    public Map<String, String> getEmailAndUserNameByWebViewLink(String webViewLink) {
+        List<File> files = getAllFiles();
+        if (files == null)
+            return null;
+        Map<String, String> objectTarget = new HashMap<>();
+        for (File file: files){
+            User ownerObject = file.getOwners().get(0);
+            if (file.getWebViewLink().equals(webViewLink)){
+                objectTarget.put(ownerObject.getEmailAddress(), ownerObject.getDisplayName());
+                return objectTarget;
+            }
+        }
+        return null;
+    }
+
+    private List<String> getParentWebViewLinks(List<File> files, List<String> parentWebViewLinks) {
         List<String> parentIdList = new ArrayList<>();
         for (File file : files) {
             for (String webViewLink : parentWebViewLinks) {

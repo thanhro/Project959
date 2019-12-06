@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,16 +56,28 @@ public class PointServiceImpl implements PointService {
 //            throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Google drive file not found", "Google drive", ErrorConstants.DRIVE_NOT_FOUND);
 //        }
         String userId = SecurityUtils.getCurrentUserLogin().get().getId();
+
         Class classObject = classRepository.findByCodeAndCoach(classCode, userId);
         if (classObject == null) {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_HAVE_PERMISSION, "User not have permission", "User permission", ErrorConstants.USER_NOT_HAVE_PERMISSION);
         }
+
+        // update point if existed
         if (validatePoint(point.getPoint()) && pointObject != null) {
             pointObject.setPoint(point.getPoint().trim());
             pointObject.setLink(point.getLink());
             pointRespository.save(pointObject);
             return;
         }
+
+        // create point if not existed
+        Map<String, String> userEmailAndName = googleDriveService.getEmailAndUserNameByWebViewLink(point.getLink());
+
+        userEmailAndName.forEach((k, v) -> {
+            point.setEmail(k);
+            point.setName(v);
+        });
+        pointRespository.save(point);
     }
 
     @Override
@@ -81,10 +94,13 @@ public class PointServiceImpl implements PointService {
             throw new BadRequestAlertException(ErrorConstants.ENTITY_NOT_FOUND, "Class not found ", "Class", ErrorConstants.CLASS_NOT_FOUND);
         }
         if (classService.isTeacher(classCode)) {
-            return pointRespository.findAll();
+            List<Assignment> assignments = assignmentService.findByClassCode(classCode);
+            List<String> studentParentWebViewLinks = assignments.stream().map(assignment -> assignment.getLink()).collect(Collectors.toList());
+            return pointRespository.getPointsByWebViewLink(googleDriveService.getChildrenWebViewLinkByParentWebViewLink(studentParentWebViewLinks));
         }
 
         String userEmail = SecurityUtils.getCurrentUserLogin().get().getEmail();
+        // lay ra list assignment trong class
         List<Assignment> assignmentList = assignmentService.findByClassCode(classCode);
         List<String> assignmentWebViewLinks = assignmentList.stream().map(link -> link.getLink()).collect(Collectors.toList());
 
